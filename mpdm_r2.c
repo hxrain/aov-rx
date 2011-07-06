@@ -69,56 +69,57 @@ static int rx_test_char(wchar_t r, wchar_t t)
 }
 
 
-static wchar_t *rx_match_here(wchar_t *regexp, wchar_t *text)
+static wchar_t *rx_match_here(wchar_t *regexp, wchar_t *text, int *o)
 {
     wchar_t c;
 
-    while (*regexp && *text) {
-
-//        wprintf(L"%s, %s\n", regexp, text);
+    while (*regexp && text[*o]) {
 
         if (regexp[1] == L'?') {
             c = *regexp;
             regexp += 2;
 
-            if (rx_test_char(c, *text))
-                text++;
+            if (rx_test_char(c, text[*o]))
+                (*o)++;
         }
         else
         if (regexp[1] == L'*') {
+            int o2;
             c = *regexp;
             regexp += 2;
 
             do {
-                regexp = rx_match_here(regexp, text);
+                o2 = *o;
+                regexp = rx_match_here(regexp, text, &o2);
             }
-            while (*regexp && *text && rx_test_char(c, *text++));
+            while (*regexp && text[*o] && rx_test_char(c, text[(*o)++]));
         }
         else
-        if (rx_test_char(*regexp, *text)) {
+        if (rx_test_char(*regexp, text[*o])) {
             regexp++;
-            text++;
+            (*o)++;
         }
         else
             break;
     }
 
-    if (!*text && *regexp == L'$')
+    if (!text[*o] && *regexp == L'$')
         regexp++;
 
     return regexp;
 }
 
-int rx_match(wchar_t *regexp, wchar_t *text, int *offset)
+int rx_match(wchar_t *regexp, wchar_t *text, int *o1, int *o2)
 {
-    *offset = 0;
+    *o1 = *o2 = 0;
 
     if (*regexp == L'^')
-        regexp = rx_match_here(regexp + 1, text);
+        regexp = rx_match_here(regexp + 1, text, o2);
     else
     do {
-        regexp = rx_match_here(regexp, &text[*offset]);
-    } while (*regexp && text[(*offset)++]);
+        *o2 = *o1;
+        regexp = rx_match_here(regexp, text, o2);
+    } while (*regexp && text[(*o1)++]);
 
     return !*regexp;
 }
@@ -127,18 +128,18 @@ int rx_match(wchar_t *regexp, wchar_t *text, int *offset)
 
 int main(int argc, char *argv[])
 {
-    int r, o;
+    int r, o1, o2;
 
-    r = MATCH(L"^text", L"this string has text", &o);
-    printf("res: %d, offset: %d\n", r, o);
-    r = MATCH(L"^this", L"this string has text", &o);
-    printf("res: %d, offset: %d\n", r, o);
-    r = MATCH(L"g.*text", L"this string has text", &o);
-    printf("res: %d, offset: %d\n", r, o);
-    r = MATCH(L"has", L"this string has text", &o);
-    printf("res: %d, offset: %d\n", r, o);
-    r = MATCH(L"text$", L"this string has text", &o);
-    printf("res: %d, offset: %d\n", r, o);
+    r = MATCH(L"^text", L"this string has text", &o1, &o2);
+    printf("res: %d, offset: %d, %d\n", r, o1, o2);
+    r = MATCH(L"^this", L"this string has text", &o1, &o2);
+    printf("res: %d, offset: %d, %d\n", r, o1, o2);
+    r = MATCH(L"g.*text", L"this string has text", &o1, &o2);
+    printf("res: %d, offset: %d, %d\n", r, o1, o2);
+    r = MATCH(L"has", L"this string has text", &o1, &o2);
+    printf("res: %d, offset: %d, %d\n", r, o1, o2);
+    r = MATCH(L"text$", L"this string has text", &o1, &o2);
+    printf("res: %d, offset: %d, %d\n", r, o1, o2);
 
     return 0;
 }
