@@ -112,16 +112,24 @@ static wchar_t *rx_match_here(wchar_t *regexp, wchar_t *text, int *o)
 int rx_match(wchar_t *regexp, wchar_t *text, int *o1, int *o2)
 {
     *o1 = *o2 = 0;
+    wchar_t *r = NULL;
 
     if (*regexp == L'^')
-        regexp = rx_match_here(regexp + 1, text, o2);
-    else
-    do {
-        *o2 = *o1;
-        regexp = rx_match_here(regexp, text, o2);
-    } while (*regexp && text[(*o1)++]);
+        r = rx_match_here(regexp + 1, text, o2);
+    else {
+        for (;;) {
+            *o2 = *o1;
 
-    return !*regexp;
+            r = rx_match_here(regexp, text, o2);
+
+            if (!*r || !text[*o1])
+                break;
+
+            (*o1)++;
+        }
+    }
+
+    return r && !*r;
 }
 
 #define MATCH rx_match
@@ -130,6 +138,8 @@ int main(int argc, char *argv[])
 {
     int r, o1, o2;
 
+    r = MATCH(L"string", L"this string has text", &o1, &o2);
+    printf("res: %d, offset: %d, %d\n", r, o1, o2);
     r = MATCH(L"^text", L"this string has text", &o1, &o2);
     printf("res: %d, offset: %d, %d\n", r, o1, o2);
     r = MATCH(L"^this", L"this string has text", &o1, &o2);
@@ -139,6 +149,8 @@ int main(int argc, char *argv[])
     r = MATCH(L"has", L"this string has text", &o1, &o2);
     printf("res: %d, offset: %d, %d\n", r, o1, o2);
     r = MATCH(L"text$", L"this string has text", &o1, &o2);
+    printf("res: %d, offset: %d, %d\n", r, o1, o2);
+    r = MATCH(L"this", L"this string has text", &o1, &o2);
     printf("res: %d, offset: %d, %d\n", r, o1, o2);
 
     return 0;
