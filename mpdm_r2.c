@@ -69,7 +69,7 @@ static int rx_test_char(wchar_t r, wchar_t t)
 }
 
 
-static wchar_t *rx_match_here(wchar_t *regexp, wchar_t *text, int *o)
+static int rx_match_here(wchar_t *regexp, wchar_t *text, int *o)
 {
     wchar_t c;
 
@@ -85,21 +85,23 @@ static wchar_t *rx_match_here(wchar_t *regexp, wchar_t *text, int *o)
         else
         if (regexp[1] == L'*') {
             int o2;
-            wchar_t *r;
             c = *regexp;
             regexp += 2;
 
             for (;;) {
                 o2 = *o;
-                r = rx_match_here(regexp, text, &o2);
 
-                if (!*r || !text[*o] || !rx_test_char(c, text[*o]))
+                if (rx_match_here(regexp, text, &o2)) {
+                    regexp = L"";
+                    *o = o2;
+                    break;
+                }
+
+                if (!text[*o] || !rx_test_char(c, text[*o]))
                     break;
 
                 (*o)++;
             }
-
-            regexp = r;
         }
         else
         if (rx_test_char(*regexp, text[*o])) {
@@ -113,13 +115,13 @@ static wchar_t *rx_match_here(wchar_t *regexp, wchar_t *text, int *o)
     if (!text[*o] && *regexp == L'$')
         regexp++;
 
-    return regexp;
+    return !*regexp;
 }
 
 int rx_match(wchar_t *regexp, wchar_t *text, int *o1, int *o2)
 {
     *o1 = *o2 = 0;
-    wchar_t *r = NULL;
+    int r = 0;
 
     if (*regexp == L'^')
         r = rx_match_here(regexp + 1, text, o2);
@@ -129,14 +131,14 @@ int rx_match(wchar_t *regexp, wchar_t *text, int *o1, int *o2)
 
             r = rx_match_here(regexp, text, o2);
 
-            if (!*r || !text[*o1])
+            if (r || !text[*o1])
                 break;
 
             (*o1)++;
         }
     }
 
-    return r && !*r;
+    return r;
 }
 
 #define MATCH rx_match
