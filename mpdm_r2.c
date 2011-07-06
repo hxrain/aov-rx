@@ -85,14 +85,21 @@ static wchar_t *rx_match_here(wchar_t *regexp, wchar_t *text, int *o)
         else
         if (regexp[1] == L'*') {
             int o2;
+            wchar_t *r;
             c = *regexp;
             regexp += 2;
 
-            do {
+            for (;;) {
                 o2 = *o;
-                regexp = rx_match_here(regexp, text, &o2);
+                r = rx_match_here(regexp, text, &o2);
+
+                if (!*r || !text[*o] || !rx_test_char(c, text[*o]))
+                    break;
+
+                (*o)++;
             }
-            while (*regexp && text[*o] && rx_test_char(c, text[(*o)++]));
+
+            regexp = r;
         }
         else
         if (rx_test_char(*regexp, text[*o])) {
@@ -138,19 +145,25 @@ int main(int argc, char *argv[])
 {
     int r, o1, o2;
 
+    r = MATCH(L"g.*text", L"this string has text", &o1, &o2);
+    printf("res: %d, offset: %d, %d\n", r, o1, o2);
     r = MATCH(L"string", L"this string has text", &o1, &o2);
     printf("res: %d, offset: %d, %d\n", r, o1, o2);
     r = MATCH(L"^text", L"this string has text", &o1, &o2);
     printf("res: %d, offset: %d, %d\n", r, o1, o2);
     r = MATCH(L"^this", L"this string has text", &o1, &o2);
     printf("res: %d, offset: %d, %d\n", r, o1, o2);
-    r = MATCH(L"g.*text", L"this string has text", &o1, &o2);
-    printf("res: %d, offset: %d, %d\n", r, o1, o2);
     r = MATCH(L"has", L"this string has text", &o1, &o2);
     printf("res: %d, offset: %d, %d\n", r, o1, o2);
     r = MATCH(L"text$", L"this string has text", &o1, &o2);
     printf("res: %d, offset: %d, %d\n", r, o1, o2);
     r = MATCH(L"this", L"this string has text", &o1, &o2);
+    printf("res: %d, offset: %d, %d\n", r, o1, o2);
+    r = MATCH(L"stri*ng", L"this string has text", &o1, &o2);
+    printf("res: %d, offset: %d, %d\n", r, o1, o2);
+    r = MATCH(L"stri*ng", L"this string has string text", &o1, &o2);
+    printf("res: %d, offset: %d, %d\n", r, o1, o2);
+    r = MATCH(L"str.*ng", L"this string has string text", &o1, &o2);
     printf("res: %d, offset: %d, %d\n", r, o1, o2);
 
     return 0;
