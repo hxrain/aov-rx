@@ -59,18 +59,20 @@ static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
     return !*rx;
 }
 
-int rx_match(wchar_t *rx, wchar_t *text, int *begin, int *end)
+int rx_match(wchar_t *rx, wchar_t *text, int *begin, int *size)
 {
-    *begin = *end = 0;
     int r = 0;
+    int end;
+
+    *begin = end = 0;
 
     if (*rx == L'^')
-        r = rx_match_here(rx + 1, text, end);
+        r = rx_match_here(rx + 1, text, &end);
     else {
         for (;;) {
-            *end = *begin;
+            end = *begin;
 
-            r = rx_match_here(rx, text, end);
+            r = rx_match_here(rx, text, &end);
 
             if (r || !text[*begin])
                 break;
@@ -78,6 +80,8 @@ int rx_match(wchar_t *rx, wchar_t *text, int *begin, int *end)
             (*begin)++;
         }
     }
+
+    *size = end - *begin;
 
     return r;
 }
@@ -107,6 +111,8 @@ int main(int argc, char *argv[])
     r = MATCH(L"stri*ng", L"this string has string text", &o1, &o2);
     printf("res: %d, offset: %d, %d\n", r, o1, o2);
     r = MATCH(L"str.*ng", L"this string has string text", &o1, &o2);
+    printf("res: %d, offset: %d, %d\n", r, o1, o2);
+    r = MATCH(L"str.*ng.*x", L"this string has string text", &o1, &o2);
     printf("res: %d, offset: %d, %d\n", r, o1, o2);
 
     return 0;
