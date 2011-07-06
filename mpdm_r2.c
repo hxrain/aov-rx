@@ -2,66 +2,7 @@
 
 /** experimental regexes **/
 
-/** based on http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html **/
-
-static int matchstar(wchar_t c, wchar_t *regexp, wchar_t *text);
-
-/* matchhere: search for regexp at beginning of text */
-static int matchhere(wchar_t *regexp, wchar_t *text)
-{
-    int r = 0;
-
-    if (!r && *regexp == L'$' && regexp[1] == L'\0')
-        r = 1;
-
-    if (regexp[0] == L'\0')
-        r = 1;
-    else
-    if (regexp[1] == L'*')
-        r = matchstar(regexp[0], regexp + 2, text);
-    else
-    if (regexp[0] == L'$' && regexp[1] == L'\0')
-        r = (*text == L'\0');
-    else
-    if (*text != L'\0' && (regexp[0] == L'.' || regexp[0] == *text))
-        r = matchhere(regexp + 1, text + 1);
-
-    return r;
-}
-
-/* matchstar: search for c*regexp at beginning of text */
-static int matchstar(wchar_t c, wchar_t *regexp, wchar_t *text)
-{
-    int r = 0;
-
-    do {
-        /* a * matches zero or more instances */
-        r = matchhere(regexp, text);
-
-    } while (!r && *text != L'\0' && (*text++ == c || c == L'.'));
-
-    return r;
-}
-
-/* match: search for regexp anywhere in text */
-int match(wchar_t *regexp, wchar_t *text)
-{
-    int r = 0;
-
-    if (regexp[0] == L'^')
-        r = matchhere(regexp + 1, text);
-    else
-    do {
-        /* must look even if string is empty */
-        r = matchhere(regexp, text);
-
-    } while (!r && *text++ != L'\0');
-
-    return r;
-}
-
-
-/** mine **/
+/** inspired by http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html **/
 
 static int rx_test_char(wchar_t r, wchar_t t)
 {
@@ -69,30 +10,30 @@ static int rx_test_char(wchar_t r, wchar_t t)
 }
 
 
-static int rx_match_here(wchar_t *regexp, wchar_t *text, int *o)
+static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
 {
     wchar_t c;
 
-    while (*regexp && text[*o]) {
+    while (*rx && text[*o]) {
 
-        if (regexp[1] == L'?') {
-            c = *regexp;
-            regexp += 2;
+        if (rx[1] == L'?') {
+            c = *rx;
+            rx += 2;
 
             if (rx_test_char(c, text[*o]))
                 (*o)++;
         }
         else
-        if (regexp[1] == L'*') {
+        if (rx[1] == L'*') {
             int o2;
-            c = *regexp;
-            regexp += 2;
+            c = *rx;
+            rx += 2;
 
             for (;;) {
                 o2 = *o;
 
-                if (rx_match_here(regexp, text, &o2)) {
-                    regexp = L"";
+                if (rx_match_here(rx, text, &o2)) {
+                    rx = L"";
                     *o = o2;
                     break;
                 }
@@ -104,37 +45,37 @@ static int rx_match_here(wchar_t *regexp, wchar_t *text, int *o)
             }
         }
         else
-        if (rx_test_char(*regexp, text[*o])) {
-            regexp++;
+        if (rx_test_char(*rx, text[*o])) {
+            rx++;
             (*o)++;
         }
         else
             break;
     }
 
-    if (!text[*o] && *regexp == L'$')
-        regexp++;
+    if (!text[*o] && *rx == L'$')
+        rx++;
 
-    return !*regexp;
+    return !*rx;
 }
 
-int rx_match(wchar_t *regexp, wchar_t *text, int *o1, int *o2)
+int rx_match(wchar_t *rx, wchar_t *text, int *begin, int *end)
 {
-    *o1 = *o2 = 0;
+    *begin = *end = 0;
     int r = 0;
 
-    if (*regexp == L'^')
-        r = rx_match_here(regexp + 1, text, o2);
+    if (*rx == L'^')
+        r = rx_match_here(rx + 1, text, end);
     else {
         for (;;) {
-            *o2 = *o1;
+            *end = *begin;
 
-            r = rx_match_here(regexp, text, o2);
+            r = rx_match_here(rx, text, end);
 
-            if (r || !text[*o1])
+            if (r || !text[*begin])
                 break;
 
-            (*o1)++;
+            (*begin)++;
         }
     }
 
