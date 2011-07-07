@@ -13,48 +13,51 @@ static int rx_test_char(wchar_t r, wchar_t t)
 static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
 {
     wchar_t c;
+    int i = *o;
 
-    while (*rx && text[*o]) {
+    while (*rx && text[i]) {
 
         if (rx[1] == L'?') {
             c = *rx;
             rx += 2;
 
-            if (rx_test_char(c, text[*o]))
-                (*o)++;
+            if (rx_test_char(c, text[i]))
+                i++;
         }
         else
         if (rx[1] == L'*') {
-            int o2;
             c = *rx;
             rx += 2;
 
             for (;;) {
-                o2 = *o;
+                int o2 = i;
 
                 if (rx_match_here(rx, text, &o2)) {
                     rx = L"";
-                    *o = o2;
+                    i = o2;
+
                     break;
                 }
 
-                if (!text[*o] || !rx_test_char(c, text[*o]))
+                if (!text[i] || !rx_test_char(c, text[i]))
                     break;
 
-                (*o)++;
+                i++;
             }
         }
         else
-        if (rx_test_char(*rx, text[*o])) {
+        if (rx_test_char(*rx, text[i])) {
             rx++;
-            (*o)++;
+            i++;
         }
         else
             break;
     }
 
-    if (!text[*o] && *rx == L'$')
+    if (!text[i] && *rx == L'$')
         rx++;
+
+    *o = i;
 
     return !*rx;
 }
