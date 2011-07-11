@@ -16,11 +16,15 @@ static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
     int i = *o;
     int done = 0;
 
-    while (!done && text[i]) {
+    while (!done) {
 
         if (*rx == L'\0') {
             /* out of rx: win */
             done = 1;
+        }
+        else
+        if (text[i] == L'\0') {
+            done = -1;
         }
         else
         if (rx[1] == L'?') {
@@ -110,7 +114,7 @@ static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
             done = -1;
     }
 
-    if (!done && !text[i] && *rx == L'$')
+    if (!text[i] && *rx == L'$')
         done = 1;
 
     *o = i;
@@ -223,12 +227,6 @@ int main(int argc, char *argv[])
 {
     int r, o1, o2;
 
-    /* + */
-/*    do_test(L"+ 0", L"one *world", L"oneworld is enough", 1, L"oneworld");*/
-    do_test(L"+ 1", L"one +world", L"oneworld is enough", 0, L"");
-    do_test(L"+ 2", L"one +world", L"one world", 1, L"one world");
-    do_test(L"+ 3", L"one +world", L"one    world", 1, L"one    world");
-
     /* ^ */
     do_test(L"Non-matching ^", L"^text", L"this string has text", 0, L"");
     do_test(L"Matching ^", L"^this", L"this string has text", 1, L"this");
@@ -261,6 +259,18 @@ int main(int argc, char *argv[])
     do_test(L"Paren 7", L".(es|com)$", L"http://triptico.com", 1, L".com");
     do_test(L"Paren 8", L".(es|com)$", L"http://triptico.es", 1, L".es");
     do_test(L"Paren 9", L".(es|com)$", L"http://triptico.org", 0, L"");
+
+    /* + */
+    do_test(L"+ 0 (really *)", L"one *world", L"oneworld is enough", 1, L"oneworld");
+    do_test(L"+ 1", L"one +world", L"oneworld", 0, L"");
+    do_test(L"+ 2", L"one +world", L"one world", 1, L"one world");
+    do_test(L"+ 3", L"one +world", L"one    world", 1, L"one    world");
+    do_test(L"+ 4", L"one +world", L"oneworld is enough", 0, L"");
+    do_test(L"+ 5", L"one +world", L"one world is enough", 1, L"one world");
+    do_test(L"+ 6", L"one +world", L"one    world is enough", 1, L"one    world");
+    do_test(L"+ 7", L"one +world", L"I say oneworld is enough", 0, L"");
+    do_test(L"+ 8", L"one +world", L"I say one world is enough", 1, L"one world");
+    do_test(L"+ 9", L"one +world", L"I say one    world is enough", 1, L"one    world");
 
     return test_summary();
 }
