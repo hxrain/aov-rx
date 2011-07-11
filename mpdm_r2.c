@@ -242,6 +242,7 @@ int main(int argc, char *argv[])
     do_test(L"i* is non-greedy", L"stri*ng", L"this string has string text", 1, L"string");
     do_test(L".* is non-greedy", L"str.*ng", L"this string has string text", 1, L"string");
     do_test(L"More than 1 .*", L"str.*ng.*x", L"this string has string text", 1, L"string has string tex");
+    do_test(L"* match to the end", L"one *world", L"one world", 1, L"one world");
 
     /* ? */
     do_test(L"? 1", L"https?://", L"http://triptico.com", 1, L"http://");
