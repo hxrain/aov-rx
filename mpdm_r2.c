@@ -24,7 +24,8 @@ static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
         }
         else
         if (text[i] == L'\0') {
-            done = -1;
+            /* out of text */
+            done = *rx == L'$' ? 1 : -1;
         }
         else
         if (rx[1] == L'?') {
@@ -113,9 +114,6 @@ static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
         else
             done = -1;
     }
-
-    if (!text[i] && *rx == L'$')
-        done = 1;
 
     *o = i;
 
