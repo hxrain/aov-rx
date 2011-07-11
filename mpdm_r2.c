@@ -39,7 +39,8 @@ static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
                     break;
                 }
 
-                if (!text[i] || !rx_test_char(c, text[i]))
+                /* this test implies !text[i] */
+                if (!rx_test_char(c, text[i]))
                     break;
 
                 i++;
