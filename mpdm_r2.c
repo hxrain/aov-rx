@@ -47,6 +47,47 @@ static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
             }
         }
         else
+        if (*rx == L'(') {
+            /* paren matching: multiple strings */
+            int ok = 0;
+            int i2;
+
+            while (!ok) {
+                i2 = i;
+
+                while (!ok && rx_test_char(*rx, text[i2])) {
+                    rx++;
+                    i2++;
+
+                    /* got to | or )? success */
+                    if (*rx == L'|' || *rx == L')')
+                        ok = 1;
+                }
+
+                if (ok) {
+                    /* move past the ) */
+                    while (*rx && *rx != L')')
+                        rx++;
+
+                    if (*rx == L')')
+                        rx++;
+
+                    i = i2;
+                }
+                else {
+                    /* move past the | */
+                    while (*rx && *rx != L'|' && *rx != L')')
+                        rx++;
+
+                    /* I don't like the 'return'... */
+                    if (*rx == L'|')
+                        rx++;
+                    else
+                        return 0;
+                }
+            }
+        }
+        else
         if (rx_test_char(*rx, text[i])) {
             rx++;
             i++;
