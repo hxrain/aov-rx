@@ -14,9 +14,15 @@ static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
 {
     wchar_t c;
     int i = *o;
+    int done = 0;
 
-    while (*rx && text[i]) {
+    while (!done && text[i]) {
 
+        if (*rx == L'\0') {
+            /* out of rx: win */
+            done = 1;
+        }
+        else
         if (rx[1] == L'?') {
             c = *rx;
             rx += 2;
@@ -33,7 +39,7 @@ static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
                 int o2 = i;
 
                 if (rx_match_here(rx, text, &o2)) {
-                    rx = L"";
+                    done = 1;
                     i = o2;
 
                     break;
@@ -49,22 +55,22 @@ static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
         else
         if (*rx == L'(') {
             /* paren matching: multiple strings */
-            int ok = 0;
+            int p_done = 0;
             int i2;
 
-            while (!ok) {
+            while (!p_done) {
                 i2 = i;
 
-                while (!ok && rx_test_char(*rx, text[i2])) {
+                while (!p_done && rx_test_char(*rx, text[i2])) {
                     rx++;
                     i2++;
 
                     /* got to | or )? success */
                     if (*rx == L'|' || *rx == L')')
-                        ok = 1;
+                        p_done = 1;
                 }
 
-                if (ok) {
+                if (p_done) {
                     /* move past the ) */
                     while (*rx && *rx != L')')
                         rx++;
@@ -79,11 +85,13 @@ static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
                     while (*rx && *rx != L'|' && *rx != L')')
                         rx++;
 
-                    /* I don't like the 'return'... */
                     if (*rx == L'|')
                         rx++;
-                    else
-                        return 0;
+                    else {
+                        /* all alternatives failed */
+                        done = -1;
+                        break;
+                    }
                 }
             }
         }
@@ -93,15 +101,15 @@ static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
             i++;
         }
         else
-            break;
+            done = -1;
     }
 
-    if (!text[i] && *rx == L'$')
-        rx++;
+    if (!done && !text[i] && *rx == L'$')
+        done = 1;
 
     *o = i;
 
-    return !*rx;
+    return done > 0;
 }
 
 int rx_match(wchar_t *rx, wchar_t *text, int *begin, int *size)
