@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
     do_test(L"esc 2", L"ready\\?", L"ready?", 1, L"ready?");
     do_test(L"esc 3", L"triptico.com", L"tripticoxcom", 1, L"tripticoxcom");
     do_test(L"esc 4", L"triptico\\.com", L"tripticoxcom", 0, L"");
-    do_test(L"esc 5", L"triptico.com", L"triptico.com", 1, L"triptico.com");
+    do_test(L"esc 5", L"triptico\\.com", L"triptico.com", 1, L"triptico.com");
 
     return test_summary();
 }
