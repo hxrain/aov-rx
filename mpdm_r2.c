@@ -28,6 +28,19 @@ static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
             done = *rx == L'$' ? 1 : -1;
         }
         else
+        if (*rx == L'\\') {
+            /* escaped character */
+            rx++;
+
+            /* direct compare */
+            if (*rx == text[i]) {
+                rx++;
+                i++;
+            }
+            else
+                done = -1;
+        }
+        else
         if (rx[1] == L'?') {
             c = *rx;
             rx += 2;
@@ -269,6 +282,14 @@ int main(int argc, char *argv[])
     do_test(L"+ 7", L"one +world", L"I say oneworld is enough", 0, L"");
     do_test(L"+ 8", L"one +world", L"I say one world is enough", 1, L"one world");
     do_test(L"+ 9", L"one +world", L"I say one    world is enough", 1, L"one    world");
+
+    /* escaped chars */
+    do_test(L"esc 0 (really ?)", L"ready?", L"ready!", 1, L"ready!");
+    do_test(L"esc 1", L"ready\\?", L"ready!", 0, L"");
+    do_test(L"esc 2", L"ready\\?", L"ready?", 1, L"ready?");
+    do_test(L"esc 3", L"triptico.com", L"tripticoxcom", 1, L"tripticoxcom");
+    do_test(L"esc 4", L"triptico\\.com", L"tripticoxcom", 0, L"");
+    do_test(L"esc 5", L"triptico.com", L"triptico.com", 1, L"triptico.com");
 
     return test_summary();
 }
