@@ -1,5 +1,8 @@
-mpdm_r2: mpdm_r2.c
-	gcc -g $< -o $@
+mpdm_r2.o: mpdm_r2.c
+	gcc -c $< -o $@
+
+stress: mpdm_r2.c
+	gcc -g -DSTRESS $< -o $@
 
 clean:
-	rm -f mpdm_r2
+	rm -f *.o stress *.exe
