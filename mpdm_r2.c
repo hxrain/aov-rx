@@ -31,11 +31,15 @@ static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
                 i++;
         }
         else
-        if (rx[1] == L'*') {
+        if (rx[1] == L'*' || rx[1] == L'+') {
             c = *rx;
             rx += 2;
 
-            for (;;) {
+            /* if it is +, at least should happen one time */
+            if (rx[-1] == L'+' && !rx_test_char(c, text[i]))
+                done = -1;
+
+            while (!done) {
                 int o2 = i;
 
                 if (rx_match_here(rx, text, &o2)) {
@@ -218,6 +222,12 @@ int test_summary(void)
 int main(int argc, char *argv[])
 {
     int r, o1, o2;
+
+    /* + */
+/*    do_test(L"+ 0", L"one *world", L"oneworld is enough", 1, L"oneworld");*/
+    do_test(L"+ 1", L"one +world", L"oneworld is enough", 0, L"");
+    do_test(L"+ 2", L"one +world", L"one world", 1, L"one world");
+    do_test(L"+ 3", L"one +world", L"one    world", 1, L"one    world");
 
     /* ^ */
     do_test(L"Non-matching ^", L"^text", L"this string has text", 0, L"");
