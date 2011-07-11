@@ -58,6 +58,8 @@ static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
             int p_done = 0;
             int i2;
 
+            rx++;
+
             while (!p_done) {
                 i2 = i;
 
@@ -237,6 +239,17 @@ int main(int argc, char *argv[])
 
     /* $ */
     do_test(L"Matching $", L"text$", L"this string has text", 1, L"text");
+
+    /* parens */
+    do_test(L"Paren 1", L"(http|ftp)://", L"http://triptico.com", 1, L"http://");
+    do_test(L"Paren 2", L"(http|ftp)://", L"ftp://triptico.com", 1, L"ftp://");
+    do_test(L"Paren 3", L"(http|ftp)s?://", L"http://triptico.com", 1, L"http://");
+    do_test(L"Paren 4", L"(http|ftp)s?://", L"ftp://triptico.com", 1, L"ftp://");
+    do_test(L"Paren 5", L"(http|ftp)s?://", L"ftps://triptico.com", 1, L"ftps://");
+    do_test(L"Paren 6", L"(gopher|http|ftp)s?://", L"http://triptico.com", 1, L"http://");
+    do_test(L"Paren 7", L".(es|com)$", L"http://triptico.com", 1, L".com");
+    do_test(L"Paren 8", L".(es|com)$", L"http://triptico.es", 1, L".es");
+    do_test(L"Paren 9", L".(es|com)$", L"http://triptico.org", 0, L"");
 
     return test_summary();
 }
