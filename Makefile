@@ -1,7 +1,7 @@
-mpdm_r2.o: mpdm_r2.c
+aov-rx.o: aov-rx.c
 	gcc -c $< -o $@
 
-stress: mpdm_r2.c
+stress: aov-rx.c
 	gcc -g -DSTRESS $< -o $@
 
 clean:
