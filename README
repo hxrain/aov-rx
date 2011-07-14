@@ -1,0 +1,29 @@
+aov-rx README
+=============
+
+ Angel Ortega <angel@triptico.com>
+
+aov-rx is another regular expression matching library.
+
+Goals
+-----
+
+ - Not using dynamic memory,
+ - using wide chars (wchar_t) natively,
+ - source code being readable, and
+ - being completely reentrant and thread-safe.
+
+Supported features
+------------------
+
+ - Start (^) and end of string ($) anchors
+ - . (match any character)
+ - ? (match 0 or 1 occurrences)
+ - * (match 0 or many occurrences)
+ - + (match 1 or many occurrences)
+ - Alternate sets (str1|str2|str3)
+ - Bracket-wrapped character sets, positive and negative ([0-9], [^0-9])
+ - Special characters for sets a-la Perl (\d, \w)
+
+---
+Angel Ortega <angel@triptico.com>
