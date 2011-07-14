@@ -1,9 +1,11 @@
 aov-rx README
 =============
 
- Angel Ortega <angel@triptico.com>
+aov-rx is Angel Ortega's regular expression matching library. This
+piece of code is designed to be part of MPDM [1] in the future, but
+can also be used separately.
 
-aov-rx is another regular expression matching library.
+ [1] http://triptico.com/software/mpdm.html (Minimum Profit Data Manager)
 
 Goals
 -----
