@@ -17,8 +17,8 @@ Goals
  - source code being readable, and
  - being completely reentrant and thread-safe.
 
-Supported features
-------------------
+Features
+--------
 
  - Start (^) and end of string ($) anchors
  - . (match any character)
