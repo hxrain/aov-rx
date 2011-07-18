@@ -21,10 +21,14 @@
     http://triptico.com
 
 */
+/** inspired by http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html **/
 
 #include <wchar.h>
 
-/** inspired by http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html **/
+#define VERSION "0.1"
+
+
+/** code **/
 
 static int rx_test_char(wchar_t r, wchar_t t)
 {
