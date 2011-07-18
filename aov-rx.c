@@ -25,7 +25,7 @@
 
 #include <wchar.h>
 
-#define VERSION "0.1"
+#define VERSION "0.2-dev"
 
 
 /** code **/
@@ -159,6 +159,21 @@ static int rx_match_here(wchar_t *rx, wchar_t *text, int *o)
     return done > 0;
 }
 
+/**
+ * rx_match - Matches a regular expression
+ * @rx: the regular expression
+ * @text: the text to be matched
+ * @begin: starting point / start of match
+ * @size: size of match
+ *
+ * Matches the @rx regular expression on the @text string. On input, the
+ * @begin argument should contain the offset to start testing (to test
+ * from the beginning, set it to 0). On output, and if the matching is
+ * positive, the @begin and @size arguments shall contain the start and
+ * size of the match, respectively.
+ * 
+ * Returns a positive number (> 0) if the match was effective.
+ */
 int rx_match(wchar_t *rx, wchar_t *text, int *begin, int *size)
 {
     int r = 0;
