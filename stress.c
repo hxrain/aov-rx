@@ -22,6 +22,7 @@ void _do_test(wchar_t *desc, wchar_t *rx, wchar_t *txt,
 
     wprintf(L"%ls: ", desc);
 
+    begin = 0;
     if (rx_match(rx, txt, &begin, &size) == exp_i) {
         /* match: test now the string */
         if (!exp_i || wcsncmp(txt + begin, exp_s, size) == 0) {

@@ -164,7 +164,7 @@ int rx_match(wchar_t *rx, wchar_t *text, int *begin, int *size)
     int r = 0;
     int end;
 
-    *begin = end = 0;
+    end = *begin;
 
     if (*rx == L'^')
         r = rx_match_here(rx + 1, text, &end);
