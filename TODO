@@ -9,6 +9,8 @@ Release Critical Bugs
  * 1002: Add support for bracket negative sets ([^a-z]).
  * 1003: Add support for Perl-like \d.
  * 1004: Add support for Perl-like \w.
+ * 1005: Add support for multiline strings ($ match the
+   end of the string or a \n).
 
 Open Bugs
 ---------
