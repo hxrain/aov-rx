@@ -1,5 +1,5 @@
 aov-rx.o: aov-rx.c
-	gcc -c $< -o $@
+	gcc -g -c $< -o $@
 
 stress: stress.c aov-rx.o
 	gcc -g $< aov-rx.o -o $@

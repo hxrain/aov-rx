@@ -75,6 +75,43 @@ int main(int argc, char *argv[])
 {
     int r, o1, o2;
 
+    o1 = o2 = 0;
+    r = aov_rx_match_one(L"[^a-c]", L"z", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_one(L"[^a-cdzx]", L"z", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_one(L"[a-c]", L"z", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_one(L"[a-cdzx]", L"z", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_one(L"[a-c]", L"b", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_one(L"[abc]", L"b", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_one(L"[abc]", L"d", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_one(L"a", L"a", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_one(L"a", L"b", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_one(L".", L"a", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_one(L"\\n", L"a", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_one(L"\\n", L"\n", &o1, &o2);
+    printf("%d\n", r);
+
     /* ^ */
     do_test(L"Non-matching ^", L"^text", L"this string has text", 0, L"");
     do_test(L"Matching ^", L"^this", L"this string has text", 1, L"this");

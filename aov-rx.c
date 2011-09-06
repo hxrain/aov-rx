@@ -23,12 +23,79 @@
 */
 /** inspired by http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html **/
 
-#include <wchar.h>
+#include "aov-rx.h"
 
-#define VERSION "0.2-dev"
+#define VERSION "0.3-dev"
 
 
 /** code **/
+
+int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)
+/* matches one subject */
+{
+    int found = 1;
+    int r = *ri;
+    wchar_t c, t;
+
+    c = rx[r++];
+    t = text[*ti];
+
+    if (c == L'[') {
+        /* set */
+        int cond = 1;
+
+        if (rx[r] == L'^') {
+            /* negative set */
+            r++;
+            cond = 0;
+        }
+
+        found = !cond;
+
+        while ((c = rx[r++]) && c != L']') {
+            wchar_t d = c;
+
+            if (rx[r] == L'-') {
+                /* range */
+                d = rx[++r];
+                r++;
+            }
+
+            if (t >= c && t <= d)
+                found = cond;
+        }
+    }
+    else
+    if (c == L'(') {
+        /* sub-regex */
+        /* ... */
+    }
+    else
+    if (c == L'\\') {
+        /* escaped char */
+        c = rx[r++];
+
+        switch (c) {
+        case L'n':  c = L'\n'; break;
+        case L'r':  c = L'\r'; break;
+        }
+
+        if (c != t)
+            found = 0;
+    }
+    else
+    if (c != L'.' && c != t)
+        found = 0;
+
+    /* advance if found */
+    if (found)
+        (*ti)++;
+
+    *ri = r;
+
+    return found;
+}
+
 
 static int rx_test_char(wchar_t r, wchar_t t)
 {
