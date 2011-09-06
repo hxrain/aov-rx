@@ -68,7 +68,7 @@ int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)
     else
     if (c == L'(') {
         /* sub-regex */
-        /* ... */
+        found = aov_rx_match_here_sub(rx, text, ri, ti);
     }
     else
     if (c == L'\\') {
@@ -88,21 +88,79 @@ int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)
         found = 0;
 
     /* advance if found */
-    if (found)
+    if (found) {
         (*ti)++;
-
-    *ri = r;
+        *ri = r;
+    }
 
     return found;
 }
 
 
+int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti)
+{
+    int done = 0;
+    int to = *ti;
+
+    /* skip the open paren */
+    (*ri)++;
+
+    while (!done) {
+        aov_rx_match_here(rx, text, ri, ti);
+
+        if (rx[*ri] == L'|' || rx[*ri] == L')') {
+            int l = 1;
+
+            /* move beyond the ), skipping others */
+            while (l) {
+                wchar_t c = rx[(*ri)++];
+
+                if (c == L'(')
+                    l++;
+                if (c == L')')
+                    l--;
+            }
+
+            done = 1;
+        }
+        else {
+            wchar_t c;
+            int l = 0;
+
+            /* rewind */
+            *ti = to;
+
+            /* find next option */
+            for (;;) {
+                c = rx[(*ri)++];
+
+                if (!c)
+                    break;
+                else
+                if (c == L'(')
+                    l++;
+                else
+                if (c == L')')
+                    l--;
+
+                if (l == 0) {
+                    if (c == L'|' || c == ')')
+                        break;
+                }
+            }
+
+            if (c != L'|')
+                done = -1;
+        }
+    }
+
+    return done > 0;
+}
+
+
 int aov_rx_match_here(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 {
-    int rr;
     int done = 0;
-
-    rr = *ri;
 
     while (!done) {
         if (rx[*ri] == L'\0') {
