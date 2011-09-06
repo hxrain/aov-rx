@@ -76,6 +76,28 @@ int main(int argc, char *argv[])
     int r, o1, o2;
 
     o1 = o2 = 0;
+    r = aov_rx_match_here(L"[a-c]*de", L"abcde", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_here(L"a*bc", L"aaabc", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_here(L"hos?la", L"hocla", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_here(L"hos?la", L"hola", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_here(L"hos?la", L"hosla", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_here(L"h.la", L"hola", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_here(L"hola", L"hola", &o1, &o2);
+    printf("%d\n", r);
+
+    o1 = o2 = 0;
     r = aov_rx_match_one(L"[^a-c]", L"z", &o1, &o2);
     printf("%d\n", r);
     o1 = o2 = 0;

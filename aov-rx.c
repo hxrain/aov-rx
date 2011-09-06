@@ -97,6 +97,59 @@ int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 }
 
 
+int aov_rx_match_here(wchar_t *rx, wchar_t *text, int *ri, int *ti)
+{
+    int rr;
+    int done = 0;
+
+    rr = *ri;
+
+    while (!done) {
+        if (rx[*ri] == L'\0') {
+            /* out of rx? win */
+            done = 1;
+        }
+        else
+        if (text[*ti] == L'\0') {
+            /* out of text */
+            done = rx[*ri] == L'$' ? 1 : -1;
+        }
+        else {
+            wchar_t p;
+            int m, ro;
+
+            /* try matching */
+            ro = *ri;
+            m = aov_rx_match_one(rx, text, ri, ti);
+
+            /* take predicate */
+            p = rx[*ri];
+
+            if (p == L'?')
+                (*ri)++;
+            else
+            if (m) {
+                if (p == L'*') {
+                    if (aov_rx_match_here(rx, text, ri, ti))
+                        done = 1;
+                    else
+                        *ri = ro;
+                }
+            }
+            else {
+                /* not matched; any possibility? */
+                if (p == L'*')
+                    (*ri)++;
+                else
+                    done = -1;
+            }
+        }
+    }
+
+    return done > 0;
+}
+
+
 static int rx_test_char(wchar_t r, wchar_t t)
 {
     return r == L'.' || r == t;
