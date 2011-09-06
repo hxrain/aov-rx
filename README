@@ -14,6 +14,7 @@ Goals
 
  - Not using dynamic memory,
  - using wide chars (wchar_t) natively,
+ - returns the matching substring as offset + size,
  - source code being readable, and
  - being completely reentrant and thread-safe.
 
