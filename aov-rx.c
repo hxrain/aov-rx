@@ -33,37 +33,39 @@
 int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 /* matches one subject */
 {
-    int found = 1;
-    int r = *ri;
+    int found = 0;
     wchar_t c, t;
 
-    c = rx[r++];
+    c = rx[(*ri)++];
     t = text[*ti];
 
     if (c == L'[') {
         /* set */
         int cond = 1;
 
-        if (rx[r] == L'^') {
+        if (rx[*ri] == L'^') {
             /* negative set */
-            r++;
+            (*ri)++;
             cond = 0;
         }
 
         found = !cond;
 
-        while ((c = rx[r++]) && c != L']') {
+        while ((c = rx[(*ri)++]) && c != L']') {
             wchar_t d = c;
 
-            if (rx[r] == L'-') {
+            if (rx[*ri] == L'-') {
                 /* range */
-                d = rx[++r];
-                r++;
+                (*ri)++;
+                d = rx[(*ri)++];
             }
 
             if (t >= c && t <= d)
                 found = cond;
         }
+
+        if (found)
+            (*ti)++;
     }
     else
     if (c == L'(') {
@@ -73,24 +75,22 @@ int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)
     else
     if (c == L'\\') {
         /* escaped char */
-        c = rx[r++];
+        c = rx[(*ri)++];
 
         switch (c) {
         case L'n':  c = L'\n'; break;
         case L'r':  c = L'\r'; break;
         }
 
-        if (c != t)
-            found = 0;
+        if (c == t) {
+            (*ti)++;
+            found = 1;
+        }
     }
     else
-    if (c != L'.' && c != t)
-        found = 0;
-
-    /* advance if found */
-    if (found) {
+    if (c == L'.' || c == t) {
         (*ti)++;
-        *ri = r;
+        found = 1;
     }
 
     return found;
@@ -101,9 +101,6 @@ int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 {
     int done = 0;
     int to = *ti;
-
-    /* skip the open paren */
-    (*ri)++;
 
     while (!done) {
         aov_rx_match_here(rx, text, ri, ti);
@@ -198,8 +195,10 @@ int aov_rx_match_here(wchar_t *rx, wchar_t *text, int *ri, int *ti)
                 /* not matched; any possibility? */
                 if (p == L'*')
                     (*ri)++;
-                else
+                else {
+                    *ri = ro;
                     done = -1;
+                }
             }
         }
     }
