@@ -121,7 +121,7 @@ int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti)
         }
         else {
             wchar_t c;
-            int l = 1;
+            int l = 0;
 
             /* rewind */
             *ti = to;
@@ -139,7 +139,7 @@ int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti)
                 if (c == L')')
                     l--;
 
-                if (l == 0) {
+                if (l <= 0) {
                     if (c == L'|' || c == ')')
                         break;
                 }
