@@ -172,14 +172,21 @@ int aov_rx_match_here(wchar_t *rx, wchar_t *text, int *ri, int *ti)
     int done = 0;
 
     while (!done) {
-        if (rx[*ri] == L'\0') {
+        wchar_t c = rx[*ri];
+
+        if (c == L'\0') {
             /* out of rx? win */
             done = 1;
         }
         else
         if (text[*ti] == L'\0') {
             /* out of text */
-            done = rx[*ri] == L'$' ? 1 : -1;
+            done = c == L'$' ? 1 : -1;
+        }
+        else
+        if (c == L'|' || c == L')') {
+            /* never match */
+            done = -1;
         }
         else {
             wchar_t p;

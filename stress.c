@@ -76,6 +76,18 @@ int main(int argc, char *argv[])
     int r, o1, o2;
 
     o1 = o2 = 0;
+    r = aov_rx_match_here(L"Rem(ark)* comment", L"Remarkark comment", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_here(L"Rem(ark)* comment", L"Remark comment", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_here(L"Rem(ark)? comment", L"Remark comment", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
+    r = aov_rx_match_here(L"Rem(ark)? comment", L"Rem comment", &o1, &o2);
+    printf("%d\n", r);
+    o1 = o2 = 0;
     r = aov_rx_match_here(L"(abc|def)1", L"abf1", &o1, &o2);
     printf("%d\n", r);
     o1 = o2 = 0;
