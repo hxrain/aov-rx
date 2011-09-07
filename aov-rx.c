@@ -39,10 +39,6 @@ int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)
     c = rx[(*ri)++];
     t = text[*ti];
 
-    /* always match . */
-    if (c == L'.')
-        c = t;
-
     if (c == L'[') {
         /* set */
         int cond = 1;
@@ -77,6 +73,9 @@ int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)
         found = aov_rx_match_here_sub(rx, text, ri, ti);
     }
     else {
+        if (c == L'.')
+            c = t;
+        else
         if (c == L'\\') {
             /* escaped char */
             c = rx[(*ri)++];
