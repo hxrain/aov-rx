@@ -31,7 +31,17 @@
 /** code **/
 
 int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)
-/* matches one subject */
+/* Matches one subject, which can be:
+   * A set (within square brackets, possible negated with ^);
+   * A sub-regex (within parens, with optional pipes for alternatives);
+   * An escaped char;
+   * A char.
+
+   ri is left pointing to the predicate (or the next subject). If
+   the match is positive, ti has moved forward.
+
+   Returns non-zero if the match is positive.
+*/
 {
     int found = 0;
     wchar_t c, t;
@@ -97,6 +107,7 @@ int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 
 
 int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti)
+/* matches a sub-regex, with ( | ) */
 {
     int done = 0;
     int to = *ti;
@@ -107,7 +118,7 @@ int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti)
         if (rx[*ri] == L'|' || rx[*ri] == L')') {
             int l = 1;
 
-            /* move beyond the ), skipping others */
+            /* move beyond the ), skipping other sub-sub-regexes */
             while (l) {
                 wchar_t c = rx[(*ri)++];
 
@@ -123,7 +134,7 @@ int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti)
             wchar_t c;
             int l = 0;
 
-            /* rewind */
+            /* rewind to test again */
             *ti = to;
 
             /* find next option */
@@ -145,6 +156,7 @@ int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti)
                 }
             }
 
+            /* no more options? matching failed */
             if (c != L'|')
                 done = -1;
         }
@@ -155,6 +167,7 @@ int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 
 
 int aov_rx_match_here(wchar_t *rx, wchar_t *text, int *ri, int *ti)
+/* matches rx in &text[*ti] position */
 {
     int done = 0;
 
