@@ -39,6 +39,10 @@ int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)
     c = rx[(*ri)++];
     t = text[*ti];
 
+    /* always match . */
+    if (c == L'.')
+        c = t;
+
     if (c == L'[') {
         /* set */
         int cond = 1;
@@ -72,25 +76,21 @@ int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)
         /* sub-regex */
         found = aov_rx_match_here_sub(rx, text, ri, ti);
     }
-    else
-    if (c == L'\\') {
-        /* escaped char */
-        c = rx[(*ri)++];
+    else {
+        if (c == L'\\') {
+            /* escaped char */
+            c = rx[(*ri)++];
 
-        switch (c) {
-        case L'n':  c = L'\n'; break;
-        case L'r':  c = L'\r'; break;
+            switch (c) {
+            case L'n':  c = L'\n'; break;
+            case L'r':  c = L'\r'; break;
+            }
         }
 
         if (c == t) {
             (*ti)++;
             found = 1;
         }
-    }
-    else
-    if (c == L'.' || c == t) {
-        (*ti)++;
-        found = 1;
     }
 
     return found;
@@ -122,7 +122,7 @@ int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti)
         }
         else {
             wchar_t c;
-            int l = 0;
+            int l = 1;
 
             /* rewind */
             *ti = to;
