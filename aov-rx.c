@@ -106,6 +106,26 @@ int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 }
 
 
+wchar_t aov_rx_skip_sub(wchar_t *rx, int *ri, int part)
+/* skips a part or a full subregex */
+{
+    wchar_t c;
+
+    while ((c = rx[(*ri)++])) {
+        if (c == L'(')
+            aov_rx_skip_sub(rx, ri, 0);
+        else
+        if (c == L')')
+            break;
+        else
+        if (part && c == L'|')
+            break;
+    }
+
+    return c;
+}
+
+
 int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 /* matches a sub-regex, with ( | ) */
 {
@@ -116,48 +136,17 @@ int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti)
         aov_rx_match_here(rx, text, ri, ti);
 
         if (rx[*ri] == L'|' || rx[*ri] == L')') {
-            int l = 1;
-
-            /* move beyond the ), skipping other sub-sub-regexes */
-            while (l) {
-                wchar_t c = rx[(*ri)++];
-
-                if (c == L'(')
-                    l++;
-                if (c == L')')
-                    l--;
-            }
+            /* found: move to the end of the subrx */
+            aov_rx_skip_sub(rx, ri, 0);
 
             done = 1;
         }
         else {
-            wchar_t c;
-            int l = 0;
-
-            /* rewind to test again */
+            /* not found: rewind to test again */
             *ti = to;
 
-            /* find next option */
-            for (;;) {
-                c = rx[(*ri)++];
-
-                if (!c)
-                    break;
-                else
-                if (c == L'(')
-                    l++;
-                else
-                if (c == L')')
-                    l--;
-
-                if (l <= 0) {
-                    if (c == L'|' || c == ')')
-                        break;
-                }
-            }
-
-            /* no more options? matching failed */
-            if (c != L'|')
+            /* move to next part, if there is any */
+            if (aov_rx_skip_sub(rx, ri, 1) != L'|')
                 done = -1;
         }
     }
