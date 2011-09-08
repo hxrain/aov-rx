@@ -161,5 +161,8 @@ int main(int argc, char *argv[])
     do_test(L"Substrs and ? 0", L"Rem(ark)? comment", L"Rem comment", 1, L"Rem comment");
     do_test(L"Substrs and ? 1", L"Rem(ark)? comment", L"Remark comment", 1, L"Remark comment");
 
+    do_test(L"More sets 0", L"'[^']*'", L"I have here a 'string' between quotes", 1, L"'string'");
+    do_test(L"More sets 1", L"'[^']*'", L"I have here a '' between quotes", 1, L"''");
+
     return test_summary();
 }
