@@ -23,7 +23,7 @@ void _do_test(wchar_t *desc, wchar_t *rx, wchar_t *txt,
     wprintf(L"%ls: ", desc);
 
     begin = 0;
-    if (rx_match(rx, txt, &begin, &size) == exp_i) {
+    if (aov_rx_match(rx, txt, &begin, &size) == exp_i) {
         /* match: test now the string */
         if (!exp_i || wcsncmp(txt + begin, exp_s, size) == 0) {
             oks++;
@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
 {
     int r, o1, o2;
 
+#if 0
     o1 = o2 = 0;
     r = aov_rx_match(L"Rem(ark)* comment", L"# Rem comment", &o1, &o2);
     printf("%d\n", r);
@@ -164,6 +165,7 @@ int main(int argc, char *argv[])
     o1 = o2 = 0;
     r = aov_rx_match_one(L"\\n", L"\n", &o1, &o2);
     printf("%d\n", r);
+#endif
 
     /* ^ */
     do_test(L"Non-matching ^", L"^text", L"this string has text", 0, L"");

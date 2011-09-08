@@ -24,6 +24,4 @@
 
 #include <wchar.h>
 
-int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti);
-
-int rx_match(wchar_t *rx, wchar_t *text, int *begin, int *size);
+int aov_rx_match(wchar_t *rx, wchar_t *text, int *begin, int *size);
