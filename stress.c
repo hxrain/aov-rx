@@ -109,9 +109,6 @@ int main(int argc, char *argv[])
     r = aov_rx_match_here(L"[a-c]*de", L"abcde", &o1, &o2);
     printf("%d\n", r);
     o1 = o2 = 0;
-    r = aov_rx_match_here(L"a*bc", L"aaabc", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
     r = aov_rx_match_here(L"hos?la", L"hocla", &o1, &o2);
     printf("%d\n", r);
     o1 = o2 = 0;
@@ -127,27 +124,6 @@ int main(int argc, char *argv[])
     r = aov_rx_match_here(L"hola", L"hola", &o1, &o2);
     printf("%d\n", r);
 
-    o1 = o2 = 0;
-    r = aov_rx_match_one(L"[^a-c]", L"z", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_one(L"[^a-cdzx]", L"z", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_one(L"[a-c]", L"z", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_one(L"[a-cdzx]", L"z", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_one(L"[a-c]", L"b", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_one(L"[abc]", L"b", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_one(L"[abc]", L"d", &o1, &o2);
-    printf("%d\n", r);
     o1 = o2 = 0;
     r = aov_rx_match_one(L"a", L"a", &o1, &o2);
     printf("%d\n", r);
@@ -179,6 +155,7 @@ int main(int argc, char *argv[])
     do_test(L".* is non-greedy", L"str.*ng", L"this string has string text", 1, L"string");
     do_test(L"More than 1 .*", L"str.*ng.*x", L"this string has string text", 1, L"string has string tex");
     do_test(L"* match to the end", L"one *world", L"one world", 1, L"one world");
+    do_test(L"More *", L"a*bc", L"aaabc", 1, L"aaabc");
 
     /* ? */
     do_test(L"? 1", L"https?://", L"http://triptico.com", 1, L"http://");
@@ -219,6 +196,18 @@ int main(int argc, char *argv[])
     do_test(L"esc 3", L"triptico.com", L"tripticoxcom", 1, L"tripticoxcom");
     do_test(L"esc 4", L"triptico\\.com", L"tripticoxcom", 0, L"");
     do_test(L"esc 5", L"triptico\\.com", L"triptico.com", 1, L"triptico.com");
+
+    /* square bracket sets */
+    do_test(L"[] 0", L"[^a-c]", L"z", 1, L"z");
+    do_test(L"[] 1", L"[^a-cdzx]", L"z", 0, L"");
+    do_test(L"[] 2", L"[a-c]", L"z", 0, L"");
+    do_test(L"[] 3", L"[a-cdzx]", L"z", 1, L"z");
+    do_test(L"[] 4", L"[a-c]", L"b", 1, L"b");
+    do_test(L"[] 5", L"[abc]", L"b", 1, L"b");
+    do_test(L"[] 6", L"[abc]", L"d", 0, L"");
+
+    do_test(L"[] and * 0", L"[a-z][a-z]*", L"1234 string 456", 1, L"string");
+    do_test(L"[] and * 1", L"[a-z][a-z]*:", L"1234 string key: value 456", 1, L"key:");
 
     return test_summary();
 }
