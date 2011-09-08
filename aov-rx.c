@@ -31,16 +31,17 @@
 /** code **/
 
 int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)
-/* Matches one subject, which can be:
-   * A set (within square brackets, possible negated with ^);
-   * A sub-regex (within parens, with optional pipes for alternatives);
-   * An escaped char;
-   * A char.
+/*
+    Matches one subject, which can be:
+    * A set (within square brackets, possible negated with ^);
+    * A sub-regex (within parens, with optional pipes for alternatives);
+    * An escaped char;
+    * A char.
 
-   ri is left pointing to the predicate (or the next subject). If
-   the match is positive, ti has moved forward.
+    ri is left pointing to the predicate (or the next subject). If
+    the match is positive, ti has moved forward.
 
-   Returns non-zero if the match is positive.
+    Returns non-zero if the match is positive.
 */
 {
     int found = 0;
@@ -214,6 +215,53 @@ int aov_rx_match_here(wchar_t *rx, wchar_t *text, int *ri, int *ti)
     return done > 0;
 }
 
+
+/**
+ * aov_rx_match - Matches a regular expression
+ * @rx: the regular expression
+ * @text: the text to be matched
+ * @begin: starting point (input) / start of match (output)
+ * @size: size of match
+ *
+ * Matches the @rx regular expression on the @text string. On input, the
+ * @begin argument should contain the offset to start testing (to test
+ * from the beginning, set it to 0). On output, and if the matching is
+ * positive, the @begin and @size arguments shall contain the start and
+ * size of the match, respectively.
+ * 
+ * Returns a positive number (> 0) if the match was effective.
+ */
+int aov_rx_match(wchar_t *rx, wchar_t *text, int *begin, int *size)
+{
+    int r, ti, ri;
+
+    ri = 0;
+    ti = *begin;
+
+    if (*rx == L'^') {
+        ri++;
+        r = aov_rx_match_here(rx, text, &ri, &ti);
+    }
+    else {
+        for (;;) {
+            ti = *begin;
+
+            r = aov_rx_match_here(rx, text, &ri, &ti);
+
+            if (r || !text[ti])
+                break;
+
+            (*begin)++;
+        }
+    }
+
+    *size = ti - *begin;
+
+    return r;
+}
+
+
+/** old version **/
 
 static int rx_test_char(wchar_t r, wchar_t t)
 {
