@@ -243,6 +243,7 @@ int aov_rx_match(wchar_t *rx, wchar_t *text, int *begin, int *size)
     }
     else {
         for (;;) {
+            ri = 0;
             ti = *begin;
 
             r = aov_rx_match_here(rx, text, &ri, &ti);
