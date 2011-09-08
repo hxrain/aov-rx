@@ -73,80 +73,13 @@ int main(int argc, char *argv[])
 {
     int r, o1, o2;
 
-#if 0
-    o1 = o2 = 0;
-    r = aov_rx_match(L"Rem(ark)* comment", L"# Rem comment", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match(L"Rem(ark)* comment", L"Rem comment", &o1, &o2);
-    printf("%d\n", r);
-
-    o1 = o2 = 0;
-    r = aov_rx_match_here(L"Rem(ark)* comment", L"Rem comment", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_here(L"Rem(ark)* comment", L"Remarkark comment", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_here(L"Rem(ark)* comment", L"Remark comment", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_here(L"Rem(ark)? comment", L"Remark comment", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_here(L"Rem(ark)? comment", L"Rem comment", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_here(L"(abc|def)1", L"abf1", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_here(L"(abc|def)1", L"def1", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_here(L"(abc|def)1", L"abc1", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_here(L"[a-c]*de", L"abcde", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_here(L"hos?la", L"hocla", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_here(L"hos?la", L"hola", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_here(L"hos?la", L"hosla", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_here(L"h.la", L"hola", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_here(L"hola", L"hola", &o1, &o2);
-    printf("%d\n", r);
-
-    o1 = o2 = 0;
-    r = aov_rx_match_one(L"a", L"a", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_one(L"a", L"b", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_one(L".", L"a", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_one(L"\\n", L"a", &o1, &o2);
-    printf("%d\n", r);
-    o1 = o2 = 0;
-    r = aov_rx_match_one(L"\\n", L"\n", &o1, &o2);
-    printf("%d\n", r);
-#endif
-
     /* ^ */
     do_test(L"Non-matching ^", L"^text", L"this string has text", 0, L"");
     do_test(L"Matching ^", L"^this", L"this string has text", 1, L"this");
 
     /* basic */
     do_test(L"Basic string", L"string", L"this string has text", 1, L"string");
+    do_test(L"Dots", L"h.la", L"hola", 1, L"hola");
 
     /* * */
     do_test(L".* 1", L"g.*text", L"this string has text", 1, L"g has text");
@@ -160,6 +93,9 @@ int main(int argc, char *argv[])
     /* ? */
     do_test(L"? 1", L"https?://", L"http://triptico.com", 1, L"http://");
     do_test(L"? 2", L"https?://", L"https://triptico.com", 1, L"https://");
+    do_test(L"? 3", L"hos?la", L"hocla", 0, L"");
+    do_test(L"? 4", L"hos?la", L"hola", 1, L"hola");
+    do_test(L"? 5", L"hos?la", L"hosla", 1, L"hosla");
 
     /* $ */
     do_test(L"Matching $", L"text$", L"this string has text", 1, L"text");
@@ -196,6 +132,8 @@ int main(int argc, char *argv[])
     do_test(L"esc 3", L"triptico.com", L"tripticoxcom", 1, L"tripticoxcom");
     do_test(L"esc 4", L"triptico\\.com", L"tripticoxcom", 0, L"");
     do_test(L"esc 5", L"triptico\\.com", L"triptico.com", 1, L"triptico.com");
+    do_test(L"esc 6", L"\\n", L"string without newlines", 0, L"");
+    do_test(L"esc 7", L"\\n", L"I'm\nbroken", 1, L"\n");
 
     /* square bracket sets */
     do_test(L"[] 0", L"[^a-c]", L"z", 1, L"z");
@@ -208,6 +146,20 @@ int main(int argc, char *argv[])
 
     do_test(L"[] and * 0", L"[a-z][a-z]*", L"1234 string 456", 1, L"string");
     do_test(L"[] and * 1", L"[a-z][a-z]*:", L"1234 string key: value 456", 1, L"key:");
+    do_test(L"[] and * 2", L"[a-c]*de", L"abcde", 1, L"abcde");
+
+    /* alternate strings */
+    do_test(L"Alt strings 0", L"(abc|def)1", L"try abf1 now", 0, L"");
+    do_test(L"Alt strings 1", L"(abc|def)1", L"try def1 now", 1, L"def1");
+    do_test(L"Alt strings 2", L"(abc|def)1", L"try abc1 now", 1, L"abc1");
+
+    /* substrings */
+    do_test(L"Substrs and * 0", L"Rem(ark)* comment", L"Rem comment", 1, L"Rem comment");
+    do_test(L"Substrs and * 1", L"Rem(ark)* comment", L"Remarkark comment", 1, L"Remarkark comment");
+    do_test(L"Substrs and * 2", L"Rem(ark)* comment", L"Remark comment", 1, L"Remark comment");
+    do_test(L"Substrs and * 3", L"Rem(ark)* comment", L"<!-- Rem comment -->", 1, L"Rem comment");
+    do_test(L"Substrs and ? 0", L"Rem(ark)? comment", L"Rem comment", 1, L"Rem comment");
+    do_test(L"Substrs and ? 1", L"Rem(ark)? comment", L"Remark comment", 1, L"Remark comment");
 
     return test_summary();
 }
