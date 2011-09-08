@@ -193,6 +193,7 @@ int aov_rx_match_here(wchar_t *rx, wchar_t *text, int *ri, int *ti)
             else
             if (m) {
                 if (p == L'*') {
+                    (*ri)++;
                     if (aov_rx_match_here(rx, text, ri, ti))
                         done = 1;
                     else
