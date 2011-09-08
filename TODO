@@ -4,13 +4,11 @@ aov-rx TODO / Bug List
 Release Critical Bugs
 ---------------------
 
- * 1000: Add support for sets (needs big refactoring).
- * 1001: Add support for bracket positive sets ([a-z]).
- * 1002: Add support for bracket negative sets ([^a-z]).
  * 1003: Add support for Perl-like \d.
  * 1004: Add support for Perl-like \w.
  * 1005: Add support for multiline strings ($ match the
    end of the string or a \n).
+ * 1006: Add (back) support for +.
 
 Open Bugs
 ---------
@@ -20,5 +18,12 @@ Pending Enhancements
 
 Closed
 ------
+
+ * 1000: Add support for sets (needs big refactoring)
+   (Thu, 08 Sep 2011 16:22:15 +0200).
+ * 1001: Add support for bracket positive sets ([a-z])
+   (Thu, 08 Sep 2011 16:22:15 +0200).
+ * 1002: Add support for bracket negative sets ([^a-z])
+   (Thu, 08 Sep 2011 16:22:15 +0200).
 
 Email bugs to angel@triptico.com
