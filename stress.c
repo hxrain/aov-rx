@@ -163,6 +163,10 @@ int main(int argc, char *argv[])
 
     do_test(L"More sets 0", L"'[^']*'", L"I have here a 'string' between quotes", 1, L"'string'");
     do_test(L"More sets 1", L"'[^']*'", L"I have here a '' between quotes", 1, L"''");
+    do_test(L"More sets 2", L"[a-z][a-z]* *: *[1-9][0-9]*", L"key:15 # comment", 1, L"key:15");
+    do_test(L"More sets 3", L"[a-z][a-z]* *: *[1-9][0-9]*", L"key : 123456 # comment", 1, L"key : 123456");
+    do_test(L"More sets 4", L"[a-z][a-z]* *: *[1-9][0-9]*", L"k: 6000", 1, L"k: 6000");
+    do_test(L"More sets 5", L"[a-z][a-z]* *: *[1-9][0-9]*", L"key: 1", 1, L"key: 1");
 
     return test_summary();
 }
