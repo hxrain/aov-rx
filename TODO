@@ -10,6 +10,8 @@ Release Critical Bugs
    end of the string or a \n).
  * 1006: Add (back) support for +.
  * 1007: Fix sets with * at the end of the string.
+ * 1008: Add curly-bracket quantifiers (default quantifier: {1,1}).
+   May require another big refactoring.
 
 Open Bugs
 ---------
