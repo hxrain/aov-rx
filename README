@@ -1,13 +1,18 @@
 aov-rx README
 =============
 
-aov-rx is a malloc-free, wide-char based regular expression matching
-library. This piece of code is designed to be part of MPDM [1] in the
+aov-rx is a malloc-free [1], wide-char based regular expression matching
+library. This piece of code is designed to be part of MPDM [2] in the
 future, but can also be used separately.
 
 Please see the TODO file to know the completion status of this project.
 
- [1] http://triptico.com/software/mpdm.html (Minimum Profit Data Manager)
+Released under the GPL.
+
+Angel Ortega <angel@triptico.com>
+
+ [1] Free as in 'without', not as in 'free()'
+ [2] http://triptico.com/software/mpdm.html (Minimum Profit Data Manager)
 
 Goals
 -----
