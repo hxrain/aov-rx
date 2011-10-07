@@ -165,61 +165,66 @@ static void parse_quant(wchar_t *rx, int *ri, int *q_min, int *q_max)
 /* parses a possible quantifier at &regex[*ri] */
 {
     wchar_t c;
+    int r, mi, ma;
 
     /* default quantifier */
-    *q_min = 1;
-    *q_max = 1;
+    mi = ma = 1;
 
-    c = rx[*ri];
+    r = *ri;
+
+    c = rx[r];
 
     if (c == L'?') {
-        *q_min = 0;
-        *q_max = 1;
-        (*ri)++;
+        mi = 0;
+        ma = 1;
+        r++;
     }
     else
     if (c == L'*') {
-        *q_min = 0;
-        *q_max = QUANT_NO_MAX;
-        (*ri)++;
+        mi = 0;
+        ma = QUANT_NO_MAX;
+        r++;
     }
     else
     if (c == L'+') {
-        *q_min = 1;
-        *q_max = QUANT_NO_MAX;
-        (*ri)++;
+        mi = 1;
+        ma = QUANT_NO_MAX;
+        r++;
     }
     else
     if (c == L'{') {
         /* range in curly braces */
-        (*ri)++;
+        r++;
 
-        *q_min = 0;
-        *q_max = 0;
+        mi = ma = 0;
 
         /* before the comma */
-        while ((c = rx[*ri]) != L',' && c != L'}') {
-            *q_min = (*q_min * 10) + (c - L'0');
-            (*ri)++;
+        while ((c = rx[r]) != L',' && c != L'}') {
+            mi = (mi * 10) + (c - L'0');
+            r++;
         }
 
         /* skip the comma */
-        if (rx[*ri] == L',')
-            (*ri)++;
+        if (rx[r] == L',')
+            r++;
 
         /* after the comma */
-        while ((c = rx[*ri]) != L'}') {
-            *q_max = (*q_max * 10) + (c - L'0');
-            (*ri)++;
+        while ((c = rx[r]) != L'}') {
+            ma = (ma * 10) + (c - L'0');
+            r++;
         }
 
         /* skip the } */
-        (*ri)++;
+        r++;
 
         /* fix no max */
-        if (*q_max == 0)
-            *q_max = QUANT_NO_MAX;
+        if (ma == 0)
+            ma = QUANT_NO_MAX;
     }
+
+    *q_min  = mi;
+    *q_max  = ma;
+    *ri     = r;
 }
 
 
