@@ -166,5 +166,9 @@ int main(int argc, char *argv[])
     do_test(L"More sets 4", L"[a-z][a-z]* *: *[1-9][0-9]*", L"k: 6000", 1, L"k: 6000");
     do_test(L"More sets 5", L"[a-z][a-z]* *: *[1-9][0-9]*", L"key: 1", 1, L"key: 1");
 
+    do_test(L"Brace matches 1", L"a.{0,5}c", L"abc", 1, L"abc");
+    do_test(L"Brace matches 2", L"a.{0,5}c", L"abcdec", 1, L"abcdec");
+    do_test(L"Brace matches 3", L"a.{0,5}c", L"abcdecfghic", 0, L"");
+
     return test_summary();
 }
