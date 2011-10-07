@@ -97,7 +97,8 @@ int main(int argc, char *argv[])
     do_test(L"? 5", L"hos?la", L"hosla", 1, L"hosla");
 
     /* $ */
-    do_test(L"Matching $", L"text$", L"this string has text", 1, L"text");
+    do_test(L"Matching $ 1", L"text$", L"this string has text", 1, L"text");
+    do_test(L"Matching $ 2", L"text$", L"this string has text alone", 0, L"");
 
     /* parens */
     do_test(L"Paren 1", L"(http|ftp)://", L"http://triptico.com", 1, L"http://");
@@ -165,9 +166,16 @@ int main(int argc, char *argv[])
     do_test(L"More sets 4", L"[a-z][a-z]* *: *[1-9][0-9]*", L"k: 6000", 1, L"k: 6000");
     do_test(L"More sets 5", L"[a-z][a-z]* *: *[1-9][0-9]*", L"key: 1", 1, L"key: 1");
 
-    do_test(L"Brace matches 1", L"a.{0,5}c", L"abc", 1, L"abc");
-    do_test(L"Brace matches 2", L"a.{0,5}c", L"abcdec", 1, L"abcdec");
-    do_test(L"Brace matches 3", L"a.{0,5}c", L"abcdecfghic", 0, L"");
+    do_test(L"Brace matches 1 (like ?)", L"https{0,1}://", L"http://triptico.com", 1, L"http://");
+    do_test(L"Brace matches 2 (like ?)", L"https{0,1}://", L"https://triptico.com", 1, L"https://");
+    do_test(L"Brace matches 3 (like *)", L"a{0,}bc", L"aaabc", 1, L"aaabc");
+    do_test(L"Brace matches 4 (like +)", L"one {1,}world", L"oneworld", 0, L"");
+    do_test(L"Brace matches 5 (like +)", L"one {1,}world", L"one world", 1, L"one world");
+    do_test(L"Brace matches 6 (like +)", L"one {1,}world", L"one    world", 1, L"one    world");
+
+    do_test(L"Brace matches 11", L"a.{0,5}c", L"abc", 1, L"abc");
+    do_test(L"Brace matches 12", L"a.{0,5}c", L"abcdec", 1, L"abcdec");
+    do_test(L"Brace matches 13", L"a.{0,5}c", L"abcdecfghic", 0, L"");
 
     return test_summary();
 }
