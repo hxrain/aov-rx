@@ -23,18 +23,28 @@ Features
 
  - Start (^) and end of string ($) anchors
  - . (match any character)
- - ? (match 0 or 1 occurrences)
- - * (match 0 or many occurrences)
- - + (match 1 or many occurrences)
+ - Full quantifier support:
+   - Curly bracket with optional minimum and maximum:
+     - Exactly n matches ({n})
+     - At least n matches ({n,})
+     - At most m matches ({,m})
+     - At least n and at most m matches ({n,m})
+   - ? (match 0 or 1 occurrences, same as {0,1})
+   - * (match 0 or many occurrences, same as {0,})
+   - + (match 1 or many occurrences, same as {1,})
  - Alternate sets (str1|str2|str3)
  - Bracket-wrapped character sets, positive and negative ([0-9], [^0-9])
- - Special characters for sets a-la Perl (\d, \w)
+
+Features that will (probably) be, but not soon
+----------------------------------------------
+
+ - Optional multiline matching (i.e. ^ and $ matching lines inside
+   the string instead of the start and the end of the string)
 
 Features that (probably) will never be
 --------------------------------------
 
  - Backreferences
- - Greedy matching
 
 ---
 Angel Ortega

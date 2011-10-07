@@ -4,10 +4,6 @@ aov-rx TODO / Bug List
 Release Critical Bugs
 ---------------------
 
- * 1003: Add support for Perl-like \d.
- * 1004: Add support for Perl-like \w.
- * 1005: Add support for multiline strings ($ match the
-   end of the string or a \n).
  * 1006: Add (back) support for +.
  * 1007: Fix sets with * at the end of the string.
  * 1008: Add curly-bracket quantifiers (default quantifier: {1,1}).
@@ -18,6 +14,11 @@ Open Bugs
 
 Pending Enhancements
 --------------------
+
+ * 1003: Add support for Perl-like \d.
+ * 1004: Add support for Perl-like \w.
+ * 1005: Add support for multiline strings ($ match the
+   end of the string or a \n).
 
 Closed
 ------

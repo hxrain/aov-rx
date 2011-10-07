@@ -24,7 +24,7 @@
 
 #include "aov-rx.h"
 
-#define VERSION "0.3-dev"
+#define VERSION "0.3"
 
 
 /** code **/
