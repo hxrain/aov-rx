@@ -111,7 +111,6 @@ int main(int argc, char *argv[])
     do_test(L"Paren 8", L".(es|com)$", L"http://triptico.es", 1, L".es");
     do_test(L"Paren 9", L".(es|com)$", L"http://triptico.org", 0, L"");
 
-#if 0
     /* + */
     do_test(L"+ 0 (really *)", L"one *world", L"oneworld is enough", 1, L"oneworld");
     do_test(L"+ 1", L"one +world", L"oneworld", 0, L"");
@@ -123,7 +122,6 @@ int main(int argc, char *argv[])
     do_test(L"+ 7", L"one +world", L"I say oneworld is enough", 0, L"");
     do_test(L"+ 8", L"one +world", L"I say one world is enough", 1, L"one world");
     do_test(L"+ 9", L"one +world", L"I say one    world is enough", 1, L"one    world");
-#endif
 
     /* escaped chars */
     do_test(L"esc 0 (really ?)", L"ready?", L"ready!", 1, L"ready!");
