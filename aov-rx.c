@@ -159,7 +159,7 @@ int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 }
 
 
-#define MAX_QUANT 0x7fffffff
+#define QUANT_NO_MAX 0x7fffffff
 
 int aov_rx_match_quant(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 /* matches a subject with its quantifier */
@@ -190,13 +190,13 @@ int aov_rx_match_quant(wchar_t *rx, wchar_t *text, int *ri, int *ti)
     else
     if (c == L'*') {
         q_min = 0;
-        q_max = MAX_QUANT;
+        q_max = QUANT_NO_MAX;
         (*ri)++;
     }
     else
     if (c == L'+') {
         q_min = 1;
-        q_max = MAX_QUANT;
+        q_max = QUANT_NO_MAX;
         (*ri)++;
     }
 
@@ -210,7 +210,7 @@ int aov_rx_match_quant(wchar_t *rx, wchar_t *text, int *ri, int *ti)
         if (!aov_rx_match_one(rx, text, ri, ti))
             break;
 
-        if (q_max == MAX_QUANT) {
+        if (q_max == QUANT_NO_MAX) {
             int tt = *ti;
             *ri = rn;
 
