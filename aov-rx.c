@@ -49,6 +49,10 @@ int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)
     c = rx[(*ri)++];
     t = text[*ti];
 
+    if (t == L'\0') {
+        found = 0;
+    }
+    else
     if (c == L'[') {
         /* set */
         int cond = 1;
@@ -155,6 +159,8 @@ int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 }
 
 
+#define MAX_QUANT 0x7fffffff
+
 int aov_rx_match_quant(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 /* matches a subject with its quantifier */
 {
@@ -184,20 +190,20 @@ int aov_rx_match_quant(wchar_t *rx, wchar_t *text, int *ri, int *ti)
     else
     if (c == L'*') {
         q_min = 0;
-        q_max = 0x7fffffff;
+        q_max = MAX_QUANT;
         (*ri)++;
     }
     else
     if (c == L'+') {
         q_min = 1;
-        q_max = 0x7fffffff;
+        q_max = MAX_QUANT;
         (*ri)++;
     }
 
     /* next try will be here */
     rn = *ri;
 
-    while (q > q_min && q <= q_max) {
+    while (q >= q_min && q < q_max) {
         /* try the subject again */
         *ri = ro;
 
@@ -208,7 +214,7 @@ int aov_rx_match_quant(wchar_t *rx, wchar_t *text, int *ri, int *ti)
     }
 
     /* still in range? ok for now */
-    if (q > q_min && q <= q_max) {
+    if (q >= q_min && q <= q_max) {
         ret = 1;
         *ri = rn;
     }
