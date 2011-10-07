@@ -24,7 +24,7 @@
 
 #include "aov-rx.h"
 
-#define VERSION "0.3"
+#define VERSION "0.4-dev"
 
 
 /** code **/
@@ -37,8 +37,8 @@ int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)
     * An escaped char;
     * A char.
 
-    ri is left pointing to the predicate (or the next subject). If
-    the match is positive, ti has moved forward.
+    ri is left pointing to the optional quantifier or the next subject.
+    If the match has been positive, ti has moved forward.
 
     Returns non-zero if the match is positive.
 */
@@ -155,6 +155,68 @@ int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 }
 
 
+int aov_rx_match_quant(wchar_t *rx, wchar_t *text, int *ri, int *ti)
+/* matches a subject with its quantifier */
+{
+    wchar_t c;
+    int q_min, q, q_max;
+    int ro, rn;
+    int ret = 0;
+
+    /* default quantifier */
+    q_min = 1;
+    q_max = 1;
+
+    /* pick current position */
+    ro = *ri;
+
+    /* first match */
+    q = aov_rx_match_one(rx, text, ri, ti);
+
+    /* now parse quantifier */
+    c = rx[*ri];
+
+    if (c == L'?') {
+        q_min = 0;
+        q_max = 1;
+        (*ri)++;
+    }
+    else
+    if (c == L'*') {
+        q_min = 0;
+        q_max = 0x7fffffff;
+        (*ri)++;
+    }
+    else
+    if (c == L'+') {
+        q_min = 1;
+        q_max = 0x7fffffff;
+        (*ri)++;
+    }
+
+    /* next try will be here */
+    rn = *ri;
+
+    while (q > q_min && q <= q_max) {
+        /* try the subject again */
+        *ri = ro;
+
+        if (!aov_rx_match_one(rx, text, ri, ti))
+            break;
+
+        q++;
+    }
+
+    /* still in range? ok for now */
+    if (q > q_min && q <= q_max) {
+        ret = 1;
+        *ri = rn;
+    }
+
+    return ret;
+}
+
+
 int aov_rx_match_here(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 /* matches rx in &text[*ti] position */
 {
@@ -177,39 +239,9 @@ int aov_rx_match_here(wchar_t *rx, wchar_t *text, int *ri, int *ti)
             /* never match */
             done = -1;
         }
-        else {
-            wchar_t p;
-            int m, ro;
-
-            /* try matching */
-            ro = *ri;
-            m = aov_rx_match_one(rx, text, ri, ti);
-
-            /* take predicate */
-            p = rx[*ri];
-
-            if (p == L'?')
-                (*ri)++;
-            else
-            if (m) {
-                if (p == L'*') {
-                    (*ri)++;
-                    if (aov_rx_match_here(rx, text, ri, ti))
-                        done = 1;
-                    else
-                        *ri = ro;
-                }
-            }
-            else {
-                /* not matched; any possibility? */
-                if (p == L'*')
-                    (*ri)++;
-                else {
-                    *ri = ro;
-                    done = -1;
-                }
-            }
-        }
+        else
+        if (!aov_rx_match_quant(rx, text, ri, ti))
+            done = -1;
     }
 
     return done > 0;
