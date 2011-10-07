@@ -161,17 +161,43 @@ int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 
 #define QUANT_NO_MAX 0x7fffffff
 
+static void parse_quant(wchar_t *rx, int *ri, int *q_min, int *q_max)
+/* parses a possible quantifier at &regex[*ri] */
+{
+    wchar_t c;
+
+    /* default quantifier */
+    *q_min = 1;
+    *q_max = 1;
+
+    c = rx[*ri];
+
+    if (c == L'?') {
+        *q_min = 0;
+        *q_max = 1;
+        (*ri)++;
+    }
+    else
+    if (c == L'*') {
+        *q_min = 0;
+        *q_max = QUANT_NO_MAX;
+        (*ri)++;
+    }
+    else
+    if (c == L'+') {
+        *q_min = 1;
+        *q_max = QUANT_NO_MAX;
+        (*ri)++;
+    }
+}
+
+
 int aov_rx_match_quant(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 /* matches a subject with its quantifier */
 {
-    wchar_t c;
     int q_min, q, q_max;
     int ro, rn;
     int ret = 0;
-
-    /* default quantifier */
-    q_min = 1;
-    q_max = 1;
 
     /* pick current position */
     ro = *ri;
@@ -179,28 +205,10 @@ int aov_rx_match_quant(wchar_t *rx, wchar_t *text, int *ri, int *ti)
     /* first match */
     q = aov_rx_match_one(rx, text, ri, ti);
 
-    /* now parse quantifier */
-    c = rx[*ri];
+    /* parse the (optional) quantifier that follows */
+    parse_quant(rx, ri, &q_min, &q_max);
 
-    if (c == L'?') {
-        q_min = 0;
-        q_max = 1;
-        (*ri)++;
-    }
-    else
-    if (c == L'*') {
-        q_min = 0;
-        q_max = QUANT_NO_MAX;
-        (*ri)++;
-    }
-    else
-    if (c == L'+') {
-        q_min = 1;
-        q_max = QUANT_NO_MAX;
-        (*ri)++;
-    }
-
-    /* next try will be here */
+    /* the regex continues here */
     rn = *ri;
 
     while (q >= q_min && q < q_max) {
