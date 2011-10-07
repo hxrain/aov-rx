@@ -189,6 +189,37 @@ static void parse_quant(wchar_t *rx, int *ri, int *q_min, int *q_max)
         *q_max = QUANT_NO_MAX;
         (*ri)++;
     }
+    else
+    if (c == L'{') {
+        /* range in curly braces */
+        (*ri)++;
+
+        *q_min = 0;
+        *q_max = 0;
+
+        /* before the comma */
+        while ((c = rx[*ri]) != L',' && c != L'}') {
+            *q_min = (*q_min * 10) + (c - L'0');
+            (*ri)++;
+        }
+
+        /* skip the comma */
+        if (rx[*ri] == L',')
+            (*ri)++;
+
+        /* after the comma */
+        while ((c = rx[*ri]) != L'}') {
+            *q_max = (*q_max * 10) + (c - L'0');
+            (*ri)++;
+        }
+
+        /* skip the } */
+        (*ri)++;
+
+        /* fix no max */
+        if (*q_max == 0)
+            *q_max = QUANT_NO_MAX;
+    }
 }
 
 
