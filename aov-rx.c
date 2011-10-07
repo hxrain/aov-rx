@@ -243,22 +243,20 @@ int aov_rx_match_quant(wchar_t *rx, wchar_t *text, int *ri, int *ti)
     rn = *ri;
 
     while (q >= q_min && q < q_max) {
+        int tt;
+
         *ri = ro;
 
         /* stop counting if no more matches */
         if (!aov_rx_match_one(rx, text, ri, ti))
             break;
 
-        if (q_max == QUANT_NO_MAX) {
-            int tt = *ti;
-            *ri = rn;
+        /* if the regex matches from here, break the count */
+        tt = *ti;
+        *ri = rn;
 
-            /* if there is no maximum, break the count
-               if the rest of the rx matches; next test
-               will repeat this and finally win */
-            if (aov_rx_match_here(rx, text, ri, &tt))
-                break;
-        }
+        if (aov_rx_match_here(rx, text, ri, &tt))
+            break;
 
         q++;
     }
