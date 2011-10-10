@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
 
     do_test(L"Brace matches 11", L"a.{0,5}c", L"abc", 1, L"abc");
     do_test(L"Brace matches 12", L"a.{0,5}c", L"abcdec", 1, L"abcdec");
-    do_test(L"Brace matches 13", L"a.{0,5}c", L"abcdecfghic", 0, L"");
+    do_test(L"Brace matches 13", L"a.{0,5}c", L"abcdecfghic", 1, L"abc");
 
     return test_summary();
 }
