@@ -73,6 +73,8 @@ int main(int argc, char *argv[])
 {
     int r, o1, o2;
 
+    do_test(L"empty .*", L".*", L"", 1, L"");
+
     /* ^ */
     do_test(L"Non-matching ^", L"^text", L"this string has text", 0, L"");
     do_test(L"Matching ^", L"^this", L"this string has text", 1, L"this");
