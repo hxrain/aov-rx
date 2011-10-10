@@ -250,17 +250,17 @@ int aov_rx_match_quant(wchar_t *rx, wchar_t *text, int *ri, int *ti)
     while (q >= q_min && q < q_max) {
         int tt;
 
-        *ri = ro;
-
-        /* stop counting if no more matches */
-        if (!aov_rx_match_one(rx, text, ri, ti))
-            break;
-
         /* if the regex matches from here, break the count */
         tt = *ti;
         *ri = rn;
 
         if (aov_rx_match_here(rx, text, ri, &tt))
+            break;
+
+        *ri = ro;
+
+        /* stop counting if no more matches */
+        if (!aov_rx_match_one(rx, text, ri, ti))
             break;
 
         q++;
