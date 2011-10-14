@@ -5,8 +5,6 @@ Release Critical Bugs
 ---------------------
 
  * 1007: Fix sets with * at the end of the string.
- * 1008: Add curly-bracket quantifiers (default quantifier: {1,1}).
-   May require another big refactoring.
 
 Open Bugs
 ---------
@@ -30,5 +28,8 @@ Closed
    (Thu, 08 Sep 2011 16:22:15 +0200).
  * 1006: Add (back) support for +
    (Fri, 07 Oct 2011 13:52:36 +0200).
+ * 1008: Add curly-bracket quantifiers (default quantifier: {1,1}).
+   May require another big refactoring
+   (Fri, 14 Oct 2011 14:55:44 +0200).
 
 Email bugs to angel@triptico.com
