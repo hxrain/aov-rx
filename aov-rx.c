@@ -194,28 +194,21 @@ static void parse_quant(wchar_t *rx, int *ri, int *q_min, int *q_max)
     else
     if (c == L'{') {
         /* range in curly braces */
-        r++;
-
         mi = ma = 0;
 
         /* before the comma */
-        while ((c = rx[r]) != L',' && c != L'}') {
+        while ((c = rx[++r]) >= L'0' && c <= L'9')
             mi = (mi * 10) + (c - L'0');
-            r++;
+
+        if (c == L',') {
+            /* after the comma */
+            while ((c = rx[++r]) >= L'0' && c <= L'9')
+                ma = (ma * 10) + (c - L'0');
         }
 
-        /* skip the comma */
-        if (rx[r] == L',')
+        /* skip final curly bracket */
+        if (c == L'}')
             r++;
-
-        /* after the comma */
-        while ((c = rx[r]) != L'}') {
-            ma = (ma * 10) + (c - L'0');
-            r++;
-        }
-
-        /* skip the } */
-        r++;
 
         /* fix no max */
         if (ma == 0)
