@@ -27,6 +27,12 @@
 #define VERSION "0.4-dev"
 
 
+/** prototypes **/
+
+int aov_rx_match_here_sub(wchar_t *rx, wchar_t *text, int *ri, int *ti);
+int aov_rx_match_here(wchar_t *rx, wchar_t *text, int *ri, int *ti);
+
+
 /** code **/
 
 int aov_rx_match_one(wchar_t *rx, wchar_t *text, int *ri, int *ti)

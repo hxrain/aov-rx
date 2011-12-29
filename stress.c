@@ -1,3 +1,6 @@
+/* for wprintf() */
+#define _ISOC99_SOURCE
+
 #include <stdio.h>
 #include <wchar.h>
 #include "aov-rx.h"
@@ -9,7 +12,6 @@ int oks = 0;
 /* failed tests messages */
 char *failed_msgs[5000];
 int i_failed_msgs = 0;
-
 
 void _do_test(wchar_t *desc, wchar_t *rx, wchar_t *txt,
                 int exp_i, wchar_t *exp_s, int src_line)
@@ -53,7 +55,7 @@ int test_summary(void)
     if (oks == tests)
         wprintf(L"*** ALL TESTS PASSED\n");
     else {
-        int n;
+//        int n;
 
         wprintf(L"*** %d %s\n", tests - oks, "TESTS ---FAILED---");
 
@@ -71,7 +73,7 @@ int test_summary(void)
 
 int main(int argc, char *argv[])
 {
-    int r, o1, o2;
+//    int r, o1, o2;
 
     do_test(L"empty .*", L".*", L"", 1, L"");
 

@@ -1,8 +1,10 @@
+CFLAGS=-Wall -g
+
 aov-rx.o: aov-rx.c
-	gcc -g -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 stress: stress.c aov-rx.o
-	gcc -g $< aov-rx.o -o $@
+	$(CC) $(CFLAGS) $< aov-rx.o -o $@
 
 clean:
 	rm -f *.o stress *.exe
