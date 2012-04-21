@@ -16,6 +16,9 @@ Pending Enhancements
  * 1004: Add support for Perl-like \w.
  * 1005: Add support for multiline strings ($ match the
    end of the string or a \n).
+ * 1009: Refactor so that the source string can be a
+   scather-gather list (a list of pointer+size pairs,
+   or something like that).
 
 Closed
 ------
