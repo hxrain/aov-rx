@@ -2,12 +2,16 @@
 #define _ISOC99_SOURCE
 
 #include <stdio.h>
+#include <string.h>
 #include <wchar.h>
 #include "aov-rx.h"
 
 /* total number of tests and oks */
 int tests = 0;
 int oks = 0;
+
+int verbose = 0;
+
 
 /* failed tests messages */
 char *failed_msgs[5000];
@@ -18,8 +22,6 @@ void _do_test(wchar_t *desc, wchar_t *rx, wchar_t *txt,
 {
     int begin, size;
 
-    wprintf(L"#%d %ls: ", tests, desc);
-
     tests++;
 
     begin = 0;
@@ -28,7 +30,8 @@ void _do_test(wchar_t *desc, wchar_t *rx, wchar_t *txt,
         if (!exp_i || wcsncmp(txt + begin, exp_s, size) == 0) {
             oks++;
 
-            wprintf(L"OK (line %d)\n", src_line);
+            if (verbose)
+                wprintf(L"stress.c:%d: OK \"%ls\"\n", rx, src_line, desc);
         }
         else {
             wchar_t tmp[16000];
@@ -37,12 +40,12 @@ void _do_test(wchar_t *desc, wchar_t *rx, wchar_t *txt,
             tmp[size] = L'\0';
 
             /* different expected strings */
-            wprintf(L"*** Failed *** (line %d): ", src_line);
+            wprintf(L"stress.c:%d: (test %d, \"%ls\") *** Failed *** -- ", src_line, tests, desc);
             wprintf(L"got [%ls], expected [%ls]\n", tmp, exp_s);
         }
     }
     else {
-        wprintf(L"*** Failed *** (line %d): NOT MATCH", src_line);
+        wprintf(L"stress.c:%d: (test %d, \"%ls\") *** Failed *** -- NOT MATCH", src_line, tests, desc);
         wprintf(L", expected [%ls]\n", exp_s);
     }
 }
@@ -74,6 +77,9 @@ int test_summary(void)
 int main(int argc, char *argv[])
 {
 //    int r, o1, o2;
+
+    if (argc > 1 && strcmp(argv[1], "-v") == 0)
+        verbose = 1;
 
     do_test(L"empty .*", L".*", L"", 1, L"");
 
