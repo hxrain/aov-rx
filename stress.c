@@ -31,7 +31,7 @@ void _do_test(wchar_t *desc, wchar_t *rx, wchar_t *txt,
             oks++;
 
             if (verbose)
-                wprintf(L"stress.c:%d: OK \"%ls\"\n", rx, src_line, desc);
+                wprintf(L"stress.c:%d: OK (test %d, \"%ls\")\n", src_line, tests, desc);
         }
         else {
             wchar_t tmp[16000];
