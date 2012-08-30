@@ -470,17 +470,17 @@ wchar_t *match(wchar_t *rx, wchar_t *tx, int *size)
     if (*rx == L'^')
         ntx = match_here(rx + 1, tx);
     else {
-        int n;
-
-        for (n = 0; tx[n]; n++) {
-            if ((ntx = match_here(rx, &tx[n])))
+        while (*tx) {
+            if ((ntx = match_here(rx, tx)))
                 break;
+            else
+                tx++;
         }
     }
 
-    *size = ntx ? tx - ntx : 0;
+    *size = ntx ? ntx - tx : 0;
 
-    return ntx;
+    return tx;
 }
 
 
