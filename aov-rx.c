@@ -391,16 +391,10 @@ wchar_t *match_one(wchar_t *rx, wchar_t *tx, wchar_t **nrx, int *q1, int *q2)
         /* it's a subregex */
     }
     else
-    if (*rx == L'\\') {
+    if (*rx == L'\\' && rx[1] == *tx) {
         /* escaped char */
-        rx++;
-
-        if ((*rx == L'n' && *tx == L'\n') || (*rx == L'r' && *tx == L'\r') || *rx == *tx) {
-            rx++;
-            tx++;
-        }
-        else
-            tx = NULL;
+        rx += 2;
+        tx++;
     }
     else
     if (*rx == L'.' || *rx == *tx) {
