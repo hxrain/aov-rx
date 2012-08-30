@@ -306,6 +306,186 @@ int aov_rx_match_here(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 }
 
 
+wchar_t *_match_one(wchar_t *rx, wchar_t *tx)
+{
+    wchar_t *r = NULL;
+
+    if (*tx == L'\0') {
+    }
+    else
+    if (*rx == L'.')
+        r = tx + 1;
+    else
+    if (*rx == L'[') {
+        /* it's a set */
+        int cond = 1;
+
+        rx++;
+
+        if (*rx == L'^') {
+            /* negative set */
+            rx++;
+            cond = 0;
+        }
+
+        int found = !cond;
+
+        while (*rx && *rx != L']') {
+            wchar_t l1, l2;
+            l1 = l2 = *rx;
+
+            if (*rx == L'-') {
+                /* range */
+                rx++;
+                l2 = *rx;
+            }
+
+            if (l1 <= *tx && l2 >= *tx)
+                found = cond;
+
+            rx++;
+        }
+
+        if (*rx)
+            rx++;
+
+        if (found)
+            r = tx + 1;
+    }
+#if 0
+    else
+    if (c == L'(') {
+        /* sub-regex */
+        found = aov_rx_match_here_sub(rx, text, ri, ti);
+    }
+#endif
+    else
+    if (*rx == L'\\') {
+        /* escaped char */
+        rx++;
+
+        if ((*rx == L'n' && *tx == L'\n') || (*rx == L'r' && *tx == L'\r') || *rx == *tx) {
+            r = tx + 1;
+            rx++;
+        }
+    }
+    else
+    if (*rx == *tx) {
+        r = tx + 1;
+        rx++;
+    }
+
+    return r;
+}
+
+
+wchar_t *match_one(wchar_t *rx, wchar_t *tx, wchar_t **nrx, int *q1, int *q2)
+{
+    *q1 = *q2 = 1;
+
+    if (*rx == L'[') {
+        /* it's a set */
+    }
+    else
+    if (*rx == L'(') {
+        /* it's a subregex */
+    }
+    else
+    if (*rx == L'\\') {
+        /* escaped char */
+        rx++;
+
+        if ((*rx == L'n' && *tx == L'\n') || (*rx == L'r' && *tx == L'\r') || *rx == *tx) {
+            rx++;
+            tx++;
+        }
+        else
+            tx = NULL;
+    }
+    else
+    if (*rx == L'.' || *rx == *tx) {
+        /* period or direct match */
+        rx++;
+        tx++;
+    }
+    else
+        tx = NULL;
+
+    /* now pick the quantifiers */
+    switch (*rx) {
+    case L'?': *q1 = 0; *q2 = 1;            rx++; break;
+    case L'*': *q1 = 0; *q2 = 0x7fffffff;   rx++; break;
+    case L'+': *q1 = 1; *q2 = 0x7fffffff;   rx++; break;
+    case L'{': /* .... */ break;
+    }
+
+    *nrx = rx;
+
+    return tx;
+}
+
+
+wchar_t *match_here(wchar_t *rx, wchar_t *tx)
+{
+    if (*rx == L'\0')
+        return tx;
+    else
+    if (*tx == L'\0') {
+        if (*rx == L'$')
+            return tx;
+    }
+    else {
+        int l1, l2;
+        int q = 0;
+        wchar_t *nrx, *ntx;
+
+        for (;;) {
+            if ((ntx = match_one(rx, tx, &nrx, &l1, &l2)) == NULL) {
+                /* not match; are previous matches enough? */
+                if (q >= l1)
+                    return match_here(nrx, tx);
+                else
+                    return NULL;
+            }
+            else {
+                /* match; are they enough? */
+                q++;
+
+                if (q < l2)
+                    tx = ntx;
+                else
+                    return match_here(nrx, ntx);
+            }
+        }
+    }
+
+    return NULL;
+}
+
+
+wchar_t *match(wchar_t *rx, wchar_t *tx, int *size)
+{
+    wchar_t *ntx;
+
+    if (*rx == L'^')
+        ntx = match_here(rx + 1, tx);
+    else {
+        int n;
+
+        for (n = 0; tx[n]; n++) {
+            if ((ntx = match_here(rx, &tx[n])) == NULL)
+                tx++;
+            else
+                break;
+        }
+    }
+
+    *size = ntx ? tx - ntx : 0;
+
+    return ntx;
+}
+
+
 /**
  * aov_rx_match - Matches a regular expression
  * @rx: the regular expression
