@@ -465,7 +465,7 @@ wchar_t *match_here(wchar_t *rx, wchar_t *tx)
 
 wchar_t *match(wchar_t *rx, wchar_t *tx, int *size)
 {
-    wchar_t *ntx;
+    wchar_t *ntx = NULL;
 
     if (*rx == L'^')
         ntx = match_here(rx + 1, tx);
@@ -473,9 +473,7 @@ wchar_t *match(wchar_t *rx, wchar_t *tx, int *size)
         int n;
 
         for (n = 0; tx[n]; n++) {
-            if ((ntx = match_here(rx, &tx[n])) == NULL)
-                tx++;
-            else
+            if ((ntx = match_here(rx, &tx[n])))
                 break;
         }
     }
