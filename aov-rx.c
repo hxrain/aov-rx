@@ -439,12 +439,7 @@ wchar_t *match_one(wchar_t *rx, wchar_t *tx, wchar_t **nrx, int *limit)
 
 wchar_t *match_here(wchar_t *rx, wchar_t *tx)
 {
-    if (*rx == L'\0')
-        return tx;
-    else
-    if (*rx == L'$' && *tx == L'\0')
-        return tx;
-    else {
+    if (!(*rx == L'\0') && !(*rx == L'$' && *tx == L'\0')) {
         int cnt = 0;
 
         for (;;) {
@@ -468,7 +463,7 @@ wchar_t *match_here(wchar_t *rx, wchar_t *tx)
         }
     }
 
-    return NULL;
+    return tx;
 }
 
 
