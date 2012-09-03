@@ -379,10 +379,9 @@ wchar_t *_match_one(wchar_t *rx, wchar_t *tx)
 }
 
 
-wchar_t *match_one(wchar_t *rx, wchar_t *tx, wchar_t **nrx, int *q1, int *q2)
+wchar_t *match_one(wchar_t *rx, wchar_t *tx, wchar_t **nrx, int *limit)
 {
     wchar_t *ntx = NULL;
-    *q1 = *q2 = 1;
 
     if (*rx == L'[') {
         /* it's a set */
@@ -397,8 +396,6 @@ wchar_t *match_one(wchar_t *rx, wchar_t *tx, wchar_t **nrx, int *q1, int *q2)
         rx++;
         if (*rx == *tx)
             ntx = tx + 1;
-
-        rx += 2;
     }
     else
     if (*rx == *tx) {
@@ -411,13 +408,27 @@ wchar_t *match_one(wchar_t *rx, wchar_t *tx, wchar_t **nrx, int *q1, int *q2)
         ntx = tx + 1;
     }
 
-    /* now pick the quantifiers */
+    /* parse quantifiers */
     rx++;
-    switch (*rx) {
-    case L'?': *q1 = 0; *q2 = 1; rx++; break;
-    case L'*': *q1 = 0; *q2 = 0; rx++; break;
-    case L'+': *q1 = 1; *q2 = 0; rx++; break;
-    case L'{': /* .... */ break;
+    *limit = 1;
+
+    if (ntx) {
+        /* match: lower limit matters */
+        switch (*rx) {
+        case L'?': *limit = 0; rx++; break;
+        case L'*': *limit = 0; rx++; break;
+        case L'+': *limit = 1; rx++; break;
+        case L'{': /* .... */ break;
+        }
+    }
+    else {
+        /* not match: upper limit matters */
+        switch (*rx) {
+        case L'?': *limit = 1; rx++; break;
+        case L'*': *limit = 0; rx++; break;
+        case L'+': *limit = 0; rx++; break;
+        case L'{': /* .... */ break;
+        }
     }
 
     *nrx = rx;
@@ -434,23 +445,22 @@ wchar_t *match_here(wchar_t *rx, wchar_t *tx)
     if (*rx == L'$' && *tx == L'\0')
         return tx;
     else {
-        int l1, l2;
         int cnt = 0;
-        wchar_t *nrx, *ntx;
 
         for (;;) {
-            if ((ntx = match_one(rx, tx, &nrx, &l1, &l2)) == NULL) {
-                /* not match; are previous matches enough? */
-                if (cnt >= l1)
+            wchar_t *nrx, *ntx;
+            int limit;
+
+            if ((ntx = match_one(rx, tx, &nrx, &limit)) == NULL) {
+                if (cnt >= limit)
                     return match_here(nrx, tx);
                 else
                     return NULL;
             }
             else {
-                /* match; are they enough? */
                 cnt++;
 
-                if (!l2 || cnt < l2)
+                if (!limit || cnt < limit)
                     tx = ntx;
                 else
                     return match_here(nrx, ntx);
