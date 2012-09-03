@@ -379,39 +379,44 @@ wchar_t *_match_one(wchar_t *rx, wchar_t *tx)
 }
 
 
+wchar_t *in_set(wchar_t *rx, wchar_t *tx, int *found)
+{
+    if (*rx != L'\0' && *rx != L']') {
+        if (rx[1] == L'-') {
+            if (*tx >= *rx && *tx <= rx[2])
+                *found = 1;
+
+            rx = in_set(rx + 3, tx, found);
+        }
+        else {
+            if (*rx == *tx)
+                *found = 1;
+
+            rx = in_set(rx + 1, tx, found);
+        }
+    }
+
+    return rx;
+}
+
+
 int match_set(wchar_t **prx, wchar_t *tx)
 {
-    int r = 0;
+    int found = 0;
     wchar_t *rx = *prx;
 
     if (*rx == L'[') {
-        int c = 1;
-
-        rx++;
-
-        if (*rx == L'^') {
-            c = 0;
-            rx++;
+        if (rx[1] == L'^') {
+            rx = in_set(rx + 2, tx, &found);
+            found = !found;
         }
-
-        while (*rx && *rx != L']') {
-            if (rx[1] == L'-') {
-                rx += 2;
-
-                if (*tx >= rx[-2] && *tx <= *rx)
-                    r = c;
-            }
-            else
-            if (*rx == *tx)
-                r = c;
-
-            rx++;
-        }
+        else
+            rx = in_set(rx + 1, tx, &found);
 
         *prx = rx;
     }
 
-    return r;
+    return found;
 }
 
 
