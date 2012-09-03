@@ -384,29 +384,40 @@ wchar_t *match_one(wchar_t *rx, wchar_t *tx, wchar_t **nrx, int *limit)
     wchar_t *ntx = NULL;
 
     if (*rx == L'[') {
-        /* it's a set */
+        int f = 0, c = 1;
+
+        rx++;
+
+        if (*rx == L'^') {
+            c = 0;
+            rx++;
+        }
+
+        while (*rx && *rx != L']') {
+            wchar_t l1, l2;
+            l1 = l2 = *rx++;
+
+            if (*rx == L'-')
+                l2 = ++*rx;
+
+            if (l1 <= *tx && l2 >= *tx)
+                f = c;
+        }
+
+        if (f)
+            ntx = tx + 1;
     }
     else
     if (*rx == L'(') {
         /* it's a subregex */
     }
     else
-    if (*rx == L'\\') {
-        /* escaped char */
-        rx++;
-        if (*rx == *tx)
-            ntx = tx + 1;
-    }
-    else
-    if (*rx == *tx) {
-        /* direct match */
+    if (
+        (*rx == *tx) ||
+        (*rx == L'.' && *tx) ||
+        (*rx == L'\\' && *(++rx) == *tx)
+    )
         ntx = tx + 1;
-    }
-    else
-    if (*rx == L'.' && *tx) {
-        /* period */
-        ntx = tx + 1;
-    }
 
     /* parse quantifiers */
     rx++;
