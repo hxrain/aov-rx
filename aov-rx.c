@@ -402,6 +402,25 @@ wchar_t *match_set(wchar_t **rx, wchar_t *tx)
 }
 
 
+wchar_t *_parse_quant(wchar_t *rx, int *limit, int m)
+{
+    int lim[2] = { 1, 1 };
+
+    rx++;
+
+    switch (*rx) {
+    case L'?': lim[0] = 0; lim[1] = 1; rx++; break;
+    case L'*': lim[0] = 0; lim[1] = 0; rx++; break;
+    case L'+': lim[0] = 1; lim[1] = 0; rx++; break;
+    case L'{': /* .... */ break;
+    }
+
+    *limit = lim[m];
+
+    return rx;
+}
+
+
 wchar_t *match_one(wchar_t *rx, wchar_t *tx, wchar_t **nrx, int *limit)
 {
     wchar_t *ntx = NULL;
@@ -420,28 +439,7 @@ wchar_t *match_one(wchar_t *rx, wchar_t *tx, wchar_t **nrx, int *limit)
     )
         ntx = tx + 1;
 
-    /* parse quantifiers */
-    rx++;
-    *limit = 1;
-
-    if (ntx) {
-        /* match: lower limit matters */
-        switch (*rx) {
-        case L'?': *limit = 0; rx++; break;
-        case L'*': *limit = 0; rx++; break;
-        case L'+': *limit = 1; rx++; break;
-        case L'{': /* .... */ break;
-        }
-    }
-    else {
-        /* not match: upper limit matters */
-        switch (*rx) {
-        case L'?': *limit = 1; rx++; break;
-        case L'*': *limit = 0; rx++; break;
-        case L'+': *limit = 0; rx++; break;
-        case L'{': /* .... */ break;
-        }
-    }
+    rx = _parse_quant(rx, limit, ntx != NULL);
 
     *nrx = rx;
 
