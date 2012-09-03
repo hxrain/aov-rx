@@ -74,12 +74,18 @@ int test_summary(void)
 #define do_test(d, r, t, i, s) _do_test(d, r, t, i, s, __LINE__)
 
 
+wchar_t *match(wchar_t *rx, wchar_t *tx, int *size);
+
+
 int main(int argc, char *argv[])
 {
 //    int r, o1, o2;
 
     if (argc > 1 && strcmp(argv[1], "-v") == 0)
         verbose = 1;
+
+    int s;
+    match(L"test.*", L"test", &s);
 
     do_test(L"empty .*", L".*", L"", 1, L"");
 

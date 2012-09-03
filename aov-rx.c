@@ -407,9 +407,9 @@ wchar_t *match_one(wchar_t *rx, wchar_t *tx, wchar_t **nrx, int *q1, int *q2)
 
     /* now pick the quantifiers */
     switch (*rx) {
-    case L'?': *q1 = 0; *q2 = 1;            rx++; break;
-    case L'*': *q1 = 0; *q2 = 0x7fffffff;   rx++; break;
-    case L'+': *q1 = 1; *q2 = 0x7fffffff;   rx++; break;
+    case L'?': *q1 = 0; *q2 = 1; rx++; break;
+    case L'*': *q1 = 0; *q2 = 0; rx++; break;
+    case L'+': *q1 = 1; *q2 = 0; rx++; break;
     case L'{': /* .... */ break;
     }
 
@@ -445,7 +445,7 @@ wchar_t *match_here(wchar_t *rx, wchar_t *tx)
                 /* match; are they enough? */
                 q++;
 
-                if (q < l2)
+                if (!l2 || q < l2)
                     tx = ntx;
                 else
                     return match_here(nrx, ntx);
