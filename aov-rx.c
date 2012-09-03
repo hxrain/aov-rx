@@ -379,26 +379,39 @@ wchar_t *_match_one(wchar_t *rx, wchar_t *tx)
 }
 
 
-wchar_t *match_set(wchar_t **rx, wchar_t *tx)
+int match_set(wchar_t **prx, wchar_t *tx)
 {
-    wchar_t *nrx, *ntx = NULL;
+    int r = 0;
+    wchar_t *rx = *prx;
 
-    for (nrx = *rx + 1; *nrx && *nrx != L']'; nrx++) {
-        if (nrx[1] == L'-') {
-            nrx += 2;
-            if (*tx < nrx[-2] || *tx > *nrx)
-                continue;
+    if (*rx == L'[') {
+        int c = 1;
+
+        rx++;
+
+        if (*rx == L'^') {
+            c = 0;
+            rx++;
         }
-        else
-        if (*nrx != *tx)
-            continue;
 
-        ntx = tx + 1;
+        while (*rx && *rx != L']') {
+            if (rx[1] == L'-') {
+                rx += 2;
+
+                if (*tx >= rx[-2] && *tx <= *rx)
+                    r = c;
+            }
+            else
+            if (*rx == *tx)
+                r = c;
+
+            rx++;
+        }
+
+        *prx = rx;
     }
 
-    *rx = nrx;
-
-    return ntx;
+    return r;
 }
 
 
@@ -426,14 +439,12 @@ wchar_t *match_one(wchar_t **prx, wchar_t *tx, int *limit)
     wchar_t *rx = *prx;
     wchar_t *ntx = NULL;
 
-    if (*rx == L'[')
-        ntx = match_set(&rx, tx);
-    else
     if (*rx == L'(') {
         /* it's a subregex */
     }
     else
     if (
+        match_set(&rx, tx) ||
         (*rx == *tx) ||
         (*rx == L'.' && *tx) ||
         (*rx == L'\\' && *(++rx) == *tx)
