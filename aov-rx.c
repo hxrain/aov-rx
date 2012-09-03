@@ -447,6 +447,30 @@ wchar_t *match_one(wchar_t *rx, wchar_t *tx, wchar_t **nrx, int *limit)
 }
 
 
+wchar_t *match_here(wchar_t *rx, wchar_t *tx);
+
+wchar_t *match_here_cnt(wchar_t *rx, wchar_t *tx, int cnt)
+{
+    wchar_t *nrx, *ntx;
+    int limit;
+
+    if ((ntx = match_one(rx, tx, &nrx, &limit)) == NULL) {
+        if (cnt >= limit)
+            return match_here(nrx, tx);
+        else
+            return NULL;
+    }
+    else {
+        if (!limit || cnt < limit)
+            return match_here_cnt(rx, ntx, cnt + 1);
+        else
+            return match_here(rx, ntx);
+    }
+
+    return NULL;
+}
+
+
 wchar_t *match_here(wchar_t *rx, wchar_t *tx)
 {
     if (!(*rx == L'\0') && !(*rx == L'$' && *tx == L'\0')) {
