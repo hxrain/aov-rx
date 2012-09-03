@@ -86,6 +86,8 @@ int main(int argc, char *argv[])
 
     int s;
     match(L"test.*", L"test", &s);
+    match(L"test", L"test", &s);
+    match(L".*", L"", &s);
 
     do_test(L"empty .*", L".*", L"", 1, L"");
 

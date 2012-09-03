@@ -381,6 +381,7 @@ wchar_t *_match_one(wchar_t *rx, wchar_t *tx)
 
 wchar_t *match_one(wchar_t *rx, wchar_t *tx, wchar_t **nrx, int *q1, int *q2)
 {
+    wchar_t *ntx = NULL;
     *q1 = *q2 = 1;
 
     if (*rx == L'[') {
@@ -391,21 +392,27 @@ wchar_t *match_one(wchar_t *rx, wchar_t *tx, wchar_t **nrx, int *q1, int *q2)
         /* it's a subregex */
     }
     else
-    if (*rx == L'\\' && rx[1] == *tx) {
+    if (*rx == L'\\') {
         /* escaped char */
-        rx += 2;
-        tx++;
-    }
-    else
-    if (*rx == L'.' || *rx == *tx) {
-        /* period or direct match */
         rx++;
-        tx++;
+        if (*rx == *tx)
+            ntx = tx + 1;
+
+        rx += 2;
     }
     else
-        tx = NULL;
+    if (*rx == *tx) {
+        /* direct match */
+        ntx = tx + 1;
+    }
+    else
+    if (*rx == L'.' && *tx) {
+        /* period */
+        ntx = tx + 1;
+    }
 
     /* now pick the quantifiers */
+    rx++;
     switch (*rx) {
     case L'?': *q1 = 0; *q2 = 1; rx++; break;
     case L'*': *q1 = 0; *q2 = 0; rx++; break;
@@ -415,7 +422,7 @@ wchar_t *match_one(wchar_t *rx, wchar_t *tx, wchar_t **nrx, int *q1, int *q2)
 
     *nrx = rx;
 
-    return tx;
+    return ntx;
 }
 
 
@@ -424,28 +431,26 @@ wchar_t *match_here(wchar_t *rx, wchar_t *tx)
     if (*rx == L'\0')
         return tx;
     else
-    if (*tx == L'\0') {
-        if (*rx == L'$')
-            return tx;
-    }
+    if (*rx == L'$' && *tx == L'\0')
+        return tx;
     else {
         int l1, l2;
-        int q = 0;
+        int cnt = 0;
         wchar_t *nrx, *ntx;
 
         for (;;) {
             if ((ntx = match_one(rx, tx, &nrx, &l1, &l2)) == NULL) {
                 /* not match; are previous matches enough? */
-                if (q >= l1)
+                if (cnt >= l1)
                     return match_here(nrx, tx);
                 else
                     return NULL;
             }
             else {
                 /* match; are they enough? */
-                q++;
+                cnt++;
 
-                if (!l2 || q < l2)
+                if (!l2 || cnt < l2)
                     tx = ntx;
                 else
                     return match_here(nrx, ntx);
