@@ -379,34 +379,35 @@ wchar_t *_match_one(wchar_t *rx, wchar_t *tx)
 }
 
 
+wchar_t *match_set(wchar_t **rx, wchar_t *tx)
+{
+    wchar_t *nrx, *ntx = NULL;
+
+    for (nrx = *rx + 1; *nrx && *nrx != L']'; nrx++) {
+        if (nrx[1] == L'-') {
+            nrx += 2;
+            if (*tx < nrx[-2] || *tx > *nrx)
+                continue;
+        }
+        else
+        if (*nrx != *tx)
+            continue;
+
+        ntx = tx + 1;
+    }
+
+    *rx = nrx;
+
+    return ntx;
+}
+
+
 wchar_t *match_one(wchar_t *rx, wchar_t *tx, wchar_t **nrx, int *limit)
 {
     wchar_t *ntx = NULL;
 
-    if (*rx == L'[') {
-        int f = 0, c = 1;
-
-        rx++;
-
-        if (*rx == L'^') {
-            c = 0;
-            rx++;
-        }
-
-        while (*rx && *rx != L']') {
-            wchar_t l1, l2;
-            l1 = l2 = *rx++;
-
-            if (*rx == L'-')
-                l2 = ++*rx;
-
-            if (l1 <= *tx && l2 >= *tx)
-                f = c;
-        }
-
-        if (f)
-            ntx = tx + 1;
-    }
+    if (*rx == L'[')
+        ntx = match_set(&rx, tx);
     else
     if (*rx == L'(') {
         /* it's a subregex */
@@ -469,7 +470,7 @@ wchar_t *match_here(wchar_t *rx, wchar_t *tx)
                 if (!limit || cnt < limit)
                     tx = ntx;
                 else
-                    return match_here(nrx, ntx);
+                    return match_here(rx, ntx);
             }
         }
     }
