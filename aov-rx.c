@@ -306,77 +306,7 @@ int aov_rx_match_here(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 }
 
 
-wchar_t *_match_one(wchar_t *rx, wchar_t *tx)
-{
-    wchar_t *r = NULL;
-
-    if (*tx == L'\0') {
-    }
-    else
-    if (*rx == L'.')
-        r = tx + 1;
-    else
-    if (*rx == L'[') {
-        /* it's a set */
-        int cond = 1;
-
-        rx++;
-
-        if (*rx == L'^') {
-            /* negative set */
-            rx++;
-            cond = 0;
-        }
-
-        int found = !cond;
-
-        while (*rx && *rx != L']') {
-            wchar_t l1, l2;
-            l1 = l2 = *rx;
-
-            if (*rx == L'-') {
-                /* range */
-                rx++;
-                l2 = *rx;
-            }
-
-            if (l1 <= *tx && l2 >= *tx)
-                found = cond;
-
-            rx++;
-        }
-
-        if (*rx)
-            rx++;
-
-        if (found)
-            r = tx + 1;
-    }
-#if 0
-    else
-    if (c == L'(') {
-        /* sub-regex */
-        found = aov_rx_match_here_sub(rx, text, ri, ti);
-    }
-#endif
-    else
-    if (*rx == L'\\') {
-        /* escaped char */
-        rx++;
-
-        if ((*rx == L'n' && *tx == L'\n') || (*rx == L'r' && *tx == L'\r') || *rx == *tx) {
-            r = tx + 1;
-            rx++;
-        }
-    }
-    else
-    if (*rx == *tx) {
-        r = tx + 1;
-        rx++;
-    }
-
-    return r;
-}
+/** 0.5.x **/
 
 
 wchar_t *in_set(wchar_t *rx, wchar_t *tx, int *found)
@@ -420,7 +350,7 @@ int match_set(wchar_t **prx, wchar_t *tx)
 }
 
 
-wchar_t *_parse_quant(wchar_t *rx, int *limit, int m)
+wchar_t *parse_quantif(wchar_t *rx, int *limit, int m)
 {
     int lim[2] = { 1, 1 };
 
@@ -456,7 +386,7 @@ wchar_t *match_one(wchar_t **prx, wchar_t *tx, int *limit)
     )
         ntx = tx + 1;
 
-    rx = _parse_quant(rx, limit, ntx != NULL);
+    rx = parse_quantif(rx, limit, ntx != NULL);
 
     if (ntx == NULL)
         *prx = rx;
