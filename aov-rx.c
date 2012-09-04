@@ -415,29 +415,26 @@ wchar_t *parse_quantifier(wchar_t *rx, int *limit, int m)
 }
 
 
-wchar_t *match_one(wchar_t **prx, wchar_t *tx, int *limit)
+int match_one(wchar_t **prx, wchar_t **ptx, int *limit)
 {
     wchar_t *rx = *prx;
-    wchar_t *ntx = NULL;
+    wchar_t *tx = *ptx;
 
-    if (*rx == L'(') {
-        /* it's a subregex */
-    }
-    else
-    if (
+    int found = (
         match_set(&rx, tx) ||
         (*rx == *tx) ||
         (*rx == L'.' && *tx) ||
         (*rx == L'\\' && *(++rx) == *tx)
-    )
-        ntx = tx + 1;
+    );
 
-    rx = parse_quantifier(rx, limit, ntx != NULL);
+    rx = parse_quantifier(rx, limit, found);
 
-    if (ntx == NULL)
+    if (found)
+        *ptx = tx + 1;
+    else
         *prx = rx;
 
-    return ntx;
+    return found;
 }
 
 
@@ -445,20 +442,19 @@ wchar_t *match_here(wchar_t *rx, wchar_t *tx);
 
 wchar_t *match_here_cnt(wchar_t *rx, wchar_t *tx, int cnt)
 {
-    wchar_t *ntx;
     int limit;
 
-    if ((ntx = match_one(&rx, tx, &limit)) == NULL) {
+    if (match_one(&rx, &tx, &limit)) {
+        if (!limit || cnt < limit)
+            tx = match_here_cnt(rx, tx, cnt + 1);
+        else
+            tx = match_here(rx, tx);
+    }
+    else {
         if (cnt >= limit)
             tx = match_here(rx, tx);
         else
             tx = NULL;
-    }
-    else {
-        if (!limit || cnt < limit)
-            tx = match_here_cnt(rx, ntx, cnt + 1);
-        else
-            tx = match_here(rx, ntx);
     }
 
     return tx;
