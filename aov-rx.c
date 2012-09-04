@@ -306,6 +306,52 @@ int aov_rx_match_here(wchar_t *rx, wchar_t *text, int *ri, int *ti)
 }
 
 
+/**
+ * aov_rx_match - Matches a regular expression
+ * @rx: the regular expression
+ * @text: the text to be matched
+ * @begin: starting point (input) / start of match (output)
+ * @size: size of match
+ *
+ * Matches the @rx regular expression on the @text string. On input, the
+ * @begin argument should contain the offset to start testing (to test
+ * from the beginning, set it to 0). On output, and if the matching is
+ * positive, the @begin and @size arguments shall contain the start and
+ * size of the match, respectively.
+ * 
+ * Returns a positive number (> 0) if the match was effective.
+ */
+int aov_rx_match(wchar_t *rx, wchar_t *text, int *begin, int *size)
+{
+    int r, ti, ri;
+
+    ri = 0;
+    ti = *begin;
+
+    if (*rx == L'^') {
+        ri++;
+        r = aov_rx_match_here(rx, text, &ri, &ti);
+    }
+    else {
+        for (;;) {
+            ri = 0;
+            ti = *begin;
+
+            r = aov_rx_match_here(rx, text, &ri, &ti);
+
+            if (r || !text[ti])
+                break;
+
+            (*begin)++;
+        }
+    }
+
+    *size = ti - *begin;
+
+    return r;
+}
+
+
 /** 0.5.x **/
 
 
@@ -350,7 +396,7 @@ int match_set(wchar_t **prx, wchar_t *tx)
 }
 
 
-wchar_t *parse_quantif(wchar_t *rx, int *limit, int m)
+wchar_t *parse_quantifier(wchar_t *rx, int *limit, int m)
 {
     int lim[2] = { 1, 1 };
 
@@ -386,7 +432,7 @@ wchar_t *match_one(wchar_t **prx, wchar_t *tx, int *limit)
     )
         ntx = tx + 1;
 
-    rx = parse_quantif(rx, limit, ntx != NULL);
+    rx = parse_quantifier(rx, limit, ntx != NULL);
 
     if (ntx == NULL)
         *prx = rx;
@@ -446,50 +492,4 @@ wchar_t *match(wchar_t *rx, wchar_t *tx, int *size)
     *size = ntx ? ntx - tx : 0;
 
     return tx;
-}
-
-
-/**
- * aov_rx_match - Matches a regular expression
- * @rx: the regular expression
- * @text: the text to be matched
- * @begin: starting point (input) / start of match (output)
- * @size: size of match
- *
- * Matches the @rx regular expression on the @text string. On input, the
- * @begin argument should contain the offset to start testing (to test
- * from the beginning, set it to 0). On output, and if the matching is
- * positive, the @begin and @size arguments shall contain the start and
- * size of the match, respectively.
- * 
- * Returns a positive number (> 0) if the match was effective.
- */
-int aov_rx_match(wchar_t *rx, wchar_t *text, int *begin, int *size)
-{
-    int r, ti, ri;
-
-    ri = 0;
-    ti = *begin;
-
-    if (*rx == L'^') {
-        ri++;
-        r = aov_rx_match_here(rx, text, &ri, &ti);
-    }
-    else {
-        for (;;) {
-            ri = 0;
-            ti = *begin;
-
-            r = aov_rx_match_here(rx, text, &ri, &ti);
-
-            if (r || !text[ti])
-                break;
-
-            (*begin)++;
-        }
-    }
-
-    *size = ti - *begin;
-
-    return r;
 }
