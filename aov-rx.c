@@ -400,8 +400,6 @@ wchar_t *parse_quantifier(wchar_t *rx, int *limit, int m)
 {
     int lim[2] = { 1, 1 };
 
-    rx++;
-
     switch (*rx) {
     case L'?': lim[0] = 0; lim[1] = 1; rx++; break;
     case L'*': lim[0] = 0; lim[1] = 0; rx++; break;
@@ -427,7 +425,7 @@ int match_one(wchar_t **prx, wchar_t **ptx, int *limit)
         (*rx == L'\\' && *(++rx) == *tx)
     );
 
-    rx = parse_quantifier(rx, limit, found);
+    rx = parse_quantifier(rx + 1, limit, found);
 
     if (found)
         *ptx = tx + 1;
