@@ -433,13 +433,13 @@ int match_one(wchar_t **prx, wchar_t *tx, int c, int *limit)
 }
 
 
-int match_here(wchar_t **rx, wchar_t *tx, int c);
+int match_here(wchar_t *rx, wchar_t *tx, int c);
 
-int match_here_cnt(wchar_t **rx, wchar_t *tx, int c, int cnt)
+int match_here_cnt(wchar_t *rx, wchar_t *tx, int c, int cnt)
 {
     int limit;
 
-    if (match_one(rx, tx, c, &limit)) {
+    if (match_one(&rx, tx, c, &limit)) {
         if (!limit || cnt < limit)
             c = match_here_cnt(rx, tx, c + 1, cnt + 1);
         else
@@ -456,9 +456,9 @@ int match_here_cnt(wchar_t **rx, wchar_t *tx, int c, int cnt)
 }
 
 
-int match_here(wchar_t **rx, wchar_t *tx, int c)
+int match_here(wchar_t *rx, wchar_t *tx, int c)
 {
-    if (!(**rx == L'\0') && !(**rx == L'$' && tx[c] == L'\0'))
+    if (!(*rx == L'\0') && !(*rx == L'$' && tx[c] == L'\0'))
         c = match_here_cnt(rx, tx, c, 0);
 
     return c;
@@ -467,13 +467,11 @@ int match_here(wchar_t **rx, wchar_t *tx, int c)
 
 wchar_t *match(wchar_t *rx, wchar_t *tx, int *size)
 {
-    if (*rx == L'^') {
-        rx++;
-        *size = match_here(&rx, tx, 0);
-    }
+    if (*rx == L'^')
+        *size = match_here(rx + 1, tx, 0);
     else {
         while (*tx) {
-            if ((*size = match_here(&rx, tx, 0)))
+            if ((*size = match_here(rx, tx, 0)))
                 break;
 
             tx++;
