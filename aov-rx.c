@@ -426,10 +426,12 @@ int match_one(wchar_t **prx, wchar_t *tx, int c, int *limit)
 
     rx = parse_quantifier(rx + 1, limit, found);
 
-    if (!found)
+    if (found)
+        c++;
+    else
         *prx = rx;
 
-    return found;
+    return c;
 }
 
 
@@ -437,16 +439,16 @@ int match_here(wchar_t *rx, wchar_t *tx, int c);
 
 int match_here_cnt(wchar_t *rx, wchar_t *tx, int c, int cnt)
 {
-    int limit;
+    int l, oc = c;
 
-    if (match_one(&rx, tx, c, &limit)) {
-        if (!limit || cnt < limit)
-            c = match_here_cnt(rx, tx, c + 1, cnt + 1);
+    if ((c = match_one(&rx, tx, c, &l)) > oc) {
+        if (!l || cnt < l)
+            c = match_here_cnt(rx, tx, c, cnt + 1);
         else
-            c = match_here(rx, tx, c + 1);
+            c = match_here(rx, tx, c);
     }
     else {
-        if (cnt >= limit)
+        if (cnt >= l)
             c = match_here(rx, tx, c);
         else
             c = 0;
