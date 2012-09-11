@@ -355,7 +355,7 @@ int aov_rx_match(wchar_t *rx, wchar_t *text, int *begin, int *size)
 /** 0.5.x **/
 
 
-wchar_t *in_set(wchar_t *rx, wchar_t *tx, int c, int *found)
+static wchar_t *in_set(wchar_t *rx, wchar_t *tx, int c, int *found)
 {
     if (*rx != L'\0' && *rx != L']') {
         if (rx[1] == L'-') {
@@ -376,7 +376,7 @@ wchar_t *in_set(wchar_t *rx, wchar_t *tx, int c, int *found)
 }
 
 
-int match_set(wchar_t **prx, wchar_t *tx, int c)
+static int match_set(wchar_t **prx, wchar_t *tx, int c)
 {
     int found = 0;
     wchar_t *rx = *prx;
@@ -396,7 +396,7 @@ int match_set(wchar_t **prx, wchar_t *tx, int c)
 }
 
 
-wchar_t *parse_quantifier(wchar_t *rx, int *limit, int m)
+static wchar_t *parse_quantifier(wchar_t *rx, int *limit, int m)
 {
     int lim[2] = { 1, 1 };
 
@@ -430,58 +430,44 @@ static wchar_t *skip(wchar_t *rx, wchar_t c)
 }
 
 
-int match_here(wchar_t **rx, wchar_t *tx, int c);
+static int match_here(wchar_t **rx, wchar_t *tx, int c);
 
-int match_sub(wchar_t **prx, wchar_t *tx, int c)
+static int match_one(wchar_t **prx, wchar_t *tx, int c, int *limit)
 {
-    int f = 0;
     wchar_t *rx = *prx;
     int oc = c;
 
-    if ((c = match_here(&rx, rx, c)) > oc) {
-        if (*rx == L')') {
-            rx++;
-            f = 1;
+    if (*rx == L'[') {
+        int f = 0;
+
+        if (rx[1] == L'^') {
+            rx = in_set(rx + 2, tx, c, &f);
+            f = !f;
         }
+        else
+            rx = in_set(rx + 1, tx, c, &f);
+
+        if (f)
+            c++;
     }
-
-    if (f)
-        *prx = rx;
-
-    return c;
-}
-
-
-int match_one(wchar_t **prx, wchar_t *tx, int c, int *limit)
-{
-    wchar_t *rx = *prx;
-    int f;
-
-    if (*rx == L'(') {
-        rx++;
-        c = match_sub(&rx, tx, c);
-    }
-
-    f = (
-//        match_sub(&rx, tx, c) ||
-        match_set(&rx, tx, c) ||
+    else
+    if (
         (*rx == tx[c]) ||
         (*rx == L'.' && tx[c]) ||
         (*rx == L'\\' && *(++rx) == tx[c])
-    );
-
-    rx = parse_quantifier(rx + 1, limit, f);
-
-    if (f)
+    )
         c++;
-    else
+
+    rx = parse_quantifier(rx + 1, limit, c > oc);
+
+    if (c <= oc)
         *prx = rx;
 
     return c;
 }
 
 
-int match_here_cnt(wchar_t **rx, wchar_t *tx, int c, int cnt)
+static int match_here_cnt(wchar_t **rx, wchar_t *tx, int c, int cnt)
 {
     int l, oc = c;
 
@@ -508,7 +494,7 @@ int match_here_cnt(wchar_t **rx, wchar_t *tx, int c, int cnt)
 }
 
 
-int match_here(wchar_t **rx, wchar_t *tx, int c)
+static int match_here(wchar_t **rx, wchar_t *tx, int c)
 {
     if (!(**rx == L'\0') && !(**rx == L'$' && tx[c] == L'\0')) {
         if (**rx == L'|') {
