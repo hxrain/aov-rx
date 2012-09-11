@@ -413,20 +413,51 @@ wchar_t *parse_quantifier(wchar_t *rx, int *limit, int m)
 }
 
 
+int match_here(wchar_t **rx, wchar_t *tx, int c);
+
+int match_sub(wchar_t **prx, wchar_t *tx, int c)
+{
+    int f = 0;
+    wchar_t *rx = *prx;
+    int oc = c;
+
+    if ((c = match_here(&rx, rx, c)) > oc) {
+        /* found; end of match? */
+        if (*rx == L')') {
+            rx++;
+            f = 1;
+        }
+    }
+
+    if (f)
+        *prx = rx;
+
+    return f;
+}
+
+
 int match_one(wchar_t **prx, wchar_t *tx, int c, int *limit)
 {
     wchar_t *rx = *prx;
+    int f;
 
-    int found = (
+    if (*rx == L'(') {
+        rx++;
+
+        c = match_sub(&rx, tx, c);
+    }
+
+    f = (
+//        match_sub(&rx, tx, c) ||
         match_set(&rx, tx, c) ||
         (*rx == tx[c]) ||
         (*rx == L'.' && tx[c]) ||
         (*rx == L'\\' && *(++rx) == tx[c])
     );
 
-    rx = parse_quantifier(rx + 1, limit, found);
+    rx = parse_quantifier(rx + 1, limit, f);
 
-    if (found)
+    if (f)
         c++;
     else
         *prx = rx;
@@ -435,13 +466,11 @@ int match_one(wchar_t **prx, wchar_t *tx, int c, int *limit)
 }
 
 
-int match_here(wchar_t *rx, wchar_t *tx, int c);
-
-int match_here_cnt(wchar_t *rx, wchar_t *tx, int c, int cnt)
+int match_here_cnt(wchar_t **rx, wchar_t *tx, int c, int cnt)
 {
     int l, oc = c;
 
-    if ((c = match_one(&rx, tx, c, &l)) > oc) {
+    if ((c = match_one(rx, tx, c, &l)) > oc) {
         if (!l || cnt < l)
             c = match_here_cnt(rx, tx, c, cnt + 1);
         else
@@ -458,27 +487,37 @@ int match_here_cnt(wchar_t *rx, wchar_t *tx, int c, int cnt)
 }
 
 
-int match_here(wchar_t *rx, wchar_t *tx, int c)
+int match_here(wchar_t **rx, wchar_t *tx, int c)
 {
-    if (!(*rx == L'\0') && !(*rx == L'$' && tx[c] == L'\0'))
+    if (!(**rx == L'\0') && !(**rx == L'$' && tx[c] == L'\0'))
         c = match_here_cnt(rx, tx, c, 0);
 
     return c;
 }
 
 
+wchar_t *match_s(wchar_t *rx, wchar_t *tx, int *size)
+{
+    *size = match_here(&rx, tx, 0);
+    return tx;
+}
+
+
+wchar_t *match_l(wchar_t *rx, wchar_t *tx, int *size)
+{
+    if (*tx && !(*size = match_here(&rx, tx, 0)))
+        tx = match_l(rx, tx + 1, size);
+
+    return tx;
+}
+
+
 wchar_t *match(wchar_t *rx, wchar_t *tx, int *size)
 {
     if (*rx == L'^')
-        *size = match_here(rx + 1, tx, 0);
-    else {
-        while (*tx) {
-            if ((*size = match_here(rx, tx, 0)))
-                break;
-
-            tx++;
-        }
-    }
+        tx = match_s(rx + 1, tx, size);
+    else
+        tx = match_l(rx, tx, size);
 
     return tx;
 }
