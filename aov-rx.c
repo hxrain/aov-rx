@@ -413,27 +413,16 @@ wchar_t *parse_quantifier(wchar_t *rx, int *limit, int m)
 }
 
 
-wchar_t *skip_sub(wchar_t *rx)
+static wchar_t *skip(wchar_t *rx, wchar_t c)
 {
-    while (*rx && *rx != L')') {
+    while (*rx && *rx != c) {
         if (*rx == L'(')
-            rx = skip_sub(rx + 1);
+            rx = skip(rx + 1, L')');
 
         rx++;
     }
 
-    return rx;
-}
-
-
-wchar_t *next_alt(wchar_t *rx)
-{
-    while (*rx && *rx != L'|') {
-        if (*rx == L'(')
-            rx = skip_sub(rx + 1);
-
-        rx++;
-    }
+    if (*rx) rx++;
 
     return rx;
 }
@@ -506,10 +495,7 @@ int match_here_cnt(wchar_t **rx, wchar_t *tx, int c, int cnt)
         else
 //            c = 0;
         {
-            wchar_t *t = next_alt(*rx + 1);
-
-            if (*t == L'|')
-                t++;
+            wchar_t *t = skip(*rx + 1, L'|');
 
             *rx = t;
             c = match_here(rx, tx, 0);
@@ -524,10 +510,7 @@ int match_here(wchar_t **rx, wchar_t *tx, int c)
 {
     if (!(**rx == L'\0') && !(**rx == L'$' && tx[c] == L'\0')) {
         if (**rx == L'|') {
-            wchar_t *t = skip_sub(*rx + 1);
-
-            if (*t == L')')
-                t++;
+            wchar_t *t = skip(*rx + 1, L')');
 
             *rx = t;
             c = match_here(rx, tx, c);

@@ -85,6 +85,9 @@ int main(int argc, char *argv[])
         verbose = 1;
 
     int s;
+    match(L"yes|no", L"yes", &s);
+    match(L"yes|no", L"no", &s);
+    match(L"yes|you", L"you", &s);
     match(L"[ba0-9]+", L"12a34c", &s);
     match(L"[0-9]+", L"12a34", &s);
     match(L"test.*", L"test", &s);
