@@ -414,8 +414,8 @@ static int match_here(wchar_t **rx, wchar_t *tx, int c);
 
 static int match_one(wchar_t **prx, wchar_t *tx, int c, int *limit)
 {
-    wchar_t *rx = *prx;
     int oc = c;
+    wchar_t *rx = *prx;
 
     if (*rx == L'[') {
         int f = 0;
@@ -449,26 +449,54 @@ static int match_one(wchar_t **prx, wchar_t *tx, int c, int *limit)
 }
 
 
-static int match_here_cnt(wchar_t **rx, wchar_t *tx, int c, int cnt)
+static int match_here_cnt(wchar_t **prx, wchar_t *tx, int c, int cnt)
 {
     int l, oc = c;
+    wchar_t *rx = *prx;
 
-    if ((c = match_one(rx, tx, c, &l)) > oc) {
-        if (!l || cnt < l)
-            c = match_here_cnt(rx, tx, c, cnt + 1);
+    if (*rx == L'[') {
+        int f = 0;
+
+        if (rx[1] == L'^') {
+            rx = in_set(rx + 2, tx[c], &f);
+            f = !f;
+        }
         else
-            c = match_here(rx, tx, c);
+            rx = in_set(rx + 1, tx[c], &f);
+
+        if (f)
+            c++;
+    }
+    if (*rx == L'.' && tx[c])
+        c++;
+    else {
+        if (*rx == L'\\')
+            rx++;
+
+        if (*rx == tx[c])
+            c++;
+    }
+
+    rx = parse_quantifier(rx + 1, &l, c > oc);
+
+    if (c > oc) {
+        *prx = rx;
+
+        if (!l || cnt < l)
+            c = match_here_cnt(prx, tx, c, cnt + 1);
+        else
+            c = match_here(prx, tx, c);
     }
     else {
         if (cnt >= l)
-            c = match_here(rx, tx, c);
+            c = match_here(prx, tx, c);
         else
 //            c = 0;
         {
-            wchar_t *t = skip_past(*rx, L'|');
+            wchar_t *t = skip_past(*prx, L'|');
 
-            *rx = t;
-            c = match_here(rx, tx, 0);
+            *prx = t;
+            c = match_here(prx, tx, 0);
         }
     }
 
