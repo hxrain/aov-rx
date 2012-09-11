@@ -504,7 +504,16 @@ int match_here_cnt(wchar_t **rx, wchar_t *tx, int c, int cnt)
         if (cnt >= l)
             c = match_here(rx, tx, c);
         else
-            c = 0;
+//            c = 0;
+        {
+            wchar_t *t = next_alt(*rx + 1);
+
+            if (*t == L'|')
+                t++;
+
+            *rx = t;
+            c = match_here(rx, tx, 0);
+        }
     }
 
     return c;
