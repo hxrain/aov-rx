@@ -415,9 +415,11 @@ wchar_t *parse_quantifier(wchar_t *rx, int *limit, int m)
 
 static wchar_t *skip(wchar_t *rx, wchar_t c)
 {
+    rx++;
+
     while (*rx && *rx != c) {
         if (*rx == L'(')
-            rx = skip(rx + 1, L')');
+            rx = skip(rx, L')');
 
         rx++;
     }
@@ -495,7 +497,7 @@ int match_here_cnt(wchar_t **rx, wchar_t *tx, int c, int cnt)
         else
 //            c = 0;
         {
-            wchar_t *t = skip(*rx + 1, L'|');
+            wchar_t *t = skip(*rx, L'|');
 
             *rx = t;
             c = match_here(rx, tx, 0);
@@ -510,7 +512,7 @@ int match_here(wchar_t **rx, wchar_t *tx, int c)
 {
     if (!(**rx == L'\0') && !(**rx == L'$' && tx[c] == L'\0')) {
         if (**rx == L'|') {
-            wchar_t *t = skip(*rx + 1, L')');
+            wchar_t *t = skip(*rx, L')');
 
             *rx = t;
             c = match_here(rx, tx, c);
