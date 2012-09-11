@@ -437,6 +437,7 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int cnt)
             if (f)
                 c++;
         }
+        else
         if (*nrx == L'.' && tx[c])
             c++;
         else {
