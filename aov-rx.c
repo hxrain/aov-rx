@@ -393,20 +393,119 @@ static wchar_t *parse_quantifier(wchar_t *rx, int *limit, int m)
 }
 
 
-static wchar_t *skip_past(wchar_t *rx, wchar_t c)
+static wchar_t *skip_past(wchar_t *rx, wchar_t c);
+
+static wchar_t *skip_to(wchar_t *rx, wchar_t c)
 {
     rx++;
 
     while (*rx && *rx != c) {
         if (*rx == L'(')
             rx = skip_past(rx, L')');
-
-        rx++;
+        else
+            rx++;
     }
 
+    return rx;
+}
+
+
+static wchar_t *skip_past(wchar_t *rx, wchar_t c)
+{
+    rx = skip_to(rx, c);
     if (*rx) rx++;
 
     return rx;
+}
+
+
+static int _match_here(wchar_t *rx, wchar_t *tx, int c, int *a)
+{
+    wchar_t *nrx = rx;
+    wchar_t *trx = rx;
+    int cnt = 0;
+
+    for (;;) {
+        int l, oc = c;
+
+        /* nothing more to match? go */
+        if (*nrx == L'\0' || (*nrx == L'$' && nrx[c] == L'\0'))
+            break;
+
+        /* end of alternative set? */
+        if (*nrx == L'|') {
+            nrx = skip_to(nrx, L')');
+            break;
+        }
+
+        /* end of subregexp? */
+        if (*nrx == L')')
+            break;
+
+        if (*nrx == L'(') {
+            int i = 0;
+
+            nrx++;
+            c += _match_here(nrx, &tx[c], 0, &i);
+            nrx += i;
+        }
+        else
+        if (*nrx == L'[') {
+            int f = 0;
+
+            if (nrx[1] == L'^') {
+                nrx = in_set(nrx + 2, tx[c], &f);
+                f = !f;
+            }
+            else
+                nrx = in_set(nrx + 1, tx[c], &f);
+
+            if (f)
+                c++;
+        }
+        else
+        if (*nrx == L'.' && tx[c])
+            c++;
+        else {
+            if (*nrx == L'\\')
+                nrx++;
+
+            if (*nrx == tx[c])
+                c++;
+        }
+
+        nrx = parse_quantifier(nrx + 1, &l, c > oc);
+
+        if (c > oc) {
+            /* upper limit not reached? try searching the same again one more time */
+            if (!l || cnt < l) {
+                trx = nrx;
+                nrx = rx;
+                cnt++;
+            }
+            else {
+                /* start with a different thing and keep moving */
+                cnt = 0;
+            }
+        }
+        else {
+            /* not matched; were previous matches enough? */
+            if (cnt >= l) {
+                /* yes; keep moving from further position seen */
+                nrx = trx;
+                cnt = 0;
+            }
+            else {
+                /* no; move beyond a possible alternative */
+                c = 0;
+                nrx = skip_past(nrx, L'|');
+            }
+        }
+    }
+
+    *a = nrx - rx;
+
+    return c;
 }
 
 
