@@ -85,6 +85,7 @@ int main(int argc, char *argv[])
         verbose = 1;
 
     int s;
+    match(L"abcde", L"abc", &s);
     match(L"(abc)+", L"abc", &s);
     match(L"(abc)+", L"abcabc", &s);
     match(L"yes|no", L"yes", &s);
