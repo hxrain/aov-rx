@@ -151,20 +151,23 @@ int main(int argc, char *argv[])
     do_test(L"esc 6", L"\n", L"string without newlines", L"");
     do_test(L"esc 7", L"\n", L"I'm\nbroken", L"\n");
 
-#if 0
     /* square bracket sets */
-    do_test(L"[] 0", L"[^a-c]", L"z", 1, L"z");
-    do_test(L"[] 1", L"[^a-cdzx]", L"z", 0, L"");
-    do_test(L"[] 2", L"[a-c]", L"z", 0, L"");
-    do_test(L"[] 3", L"[a-cdzx]", L"z", 1, L"z");
-    do_test(L"[] 4", L"[a-c]", L"b", 1, L"b");
-    do_test(L"[] 5", L"[abc]", L"b", 1, L"b");
-    do_test(L"[] 6", L"[abc]", L"d", 0, L"");
+    do_test(L"[] 0", L"[^a-c]",     L"z", L"z");
+    do_test(L"[] 1", L"[^a-cdzx]",  L"z", L"");
+    do_test(L"[] 2", L"[a-c]",      L"z", L"");
+    do_test(L"[] 3", L"[a-cdzx]",   L"z", L"z");
+    do_test(L"[] 4", L"[a-c]",      L"b", L"b");
+    do_test(L"[] 5", L"[abc]",      L"b", L"b");
+    do_test(L"[] 6", L"[abc]",      L"d", L"");
 
-    do_test(L"[] and * 0", L"[a-z][a-z]*", L"1234 string 456", 1, L"string");
-    do_test(L"[] and * 1", L"[a-z][a-z]*:", L"1234 string key: value 456", 1, L"key:");
-    do_test(L"[] and * 2", L"[a-c]*de", L"abcde", 1, L"abcde");
+    do_test(L"[] and * 0", L"[a-z][a-z]*",  L"1234 string 456", L"string");
+    do_test(L"[] and * 1", L"[a-z][a-z]*:", L"1234 string key: value 456", L"key:");
+    do_test(L"[] and * 2", L"[a-c]*de",     L"abcde", L"abcde");
 
+    do_test(L"[] and + 0", L"[a-z]+",       L"1234 string 456", L"string");
+    do_test(L"[] and + 1", L"[a-z]+:",      L"1234 string key: value 456", L"key:");
+
+#if 0
     /* alternate strings */
     do_test(L"Alt strings 0", L"(abc|def)1", L"try abf1 now", 0, L"");
     do_test(L"Alt strings 1", L"(abc|def)1", L"try def1 now", 1, L"def1");
