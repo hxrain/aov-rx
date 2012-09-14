@@ -39,7 +39,7 @@ void _do_test(wchar_t *desc, wchar_t *rx, wchar_t *tx, wchar_t *exp_s, int src_l
     }
     else {
         wprintf(L"stress.c:%d: (test %d, \"%ls\") *** Failed ***", src_line, tests, desc);
-        wprintf(L", size: %d, stx: \"%ls\", expected \"%ls\"\n", size, stx, exp_s);
+        wprintf(L", size: %d, stx: \"%ls\", expected \"%ls\"\n", size, stx2, exp_s);
     }
 }
 
@@ -139,17 +139,19 @@ int main(int argc, char *argv[])
     do_test(L"+ 7", L"one +world", L"I say oneworld is enough", 0, L"");
     do_test(L"+ 8", L"one +world", L"I say one world is enough", 1, L"one world");
     do_test(L"+ 9", L"one +world", L"I say one    world is enough", 1, L"one    world");
+#endif
 
     /* escaped chars */
-    do_test(L"esc 0 (really ?)", L"ready?", L"ready!", 1, L"ready!");
-    do_test(L"esc 1", L"ready\\?", L"ready!", 0, L"");
-    do_test(L"esc 2", L"ready\\?", L"ready?", 1, L"ready?");
-    do_test(L"esc 3", L"triptico.com", L"tripticoxcom", 1, L"tripticoxcom");
-    do_test(L"esc 4", L"triptico\\.com", L"tripticoxcom", 0, L"");
-    do_test(L"esc 5", L"triptico\\.com", L"triptico.com", 1, L"triptico.com");
-    do_test(L"esc 6", L"\\n", L"string without newlines", 0, L"");
-    do_test(L"esc 7", L"\\n", L"I'm\nbroken", 1, L"\n");
+    do_test(L"esc 0 (really ?)", L"ready?", L"ready!", L"ready");
+    do_test(L"esc 1", L"ready\\?", L"ready!", L"");
+    do_test(L"esc 2", L"ready\\?", L"ready?", L"ready?");
+    do_test(L"esc 3", L"triptico.com", L"tripticoxcom", L"tripticoxcom");
+    do_test(L"esc 4", L"triptico\\.com", L"tripticoxcom", L"");
+    do_test(L"esc 5", L"triptico\\.com", L"triptico.com", L"triptico.com");
+    do_test(L"esc 6", L"\n", L"string without newlines", L"");
+    do_test(L"esc 7", L"\n", L"I'm\nbroken", L"\n");
 
+#if 0
     /* square bracket sets */
     do_test(L"[] 0", L"[^a-c]", L"z", 1, L"z");
     do_test(L"[] 1", L"[^a-cdzx]", L"z", 0, L"");
