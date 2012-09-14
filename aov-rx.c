@@ -148,7 +148,20 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
                 c++;
         }
 
-        r = parse_quantifier(r, l);
+//        r = parse_quantifier(r, l);
+        /* parse quantifier */
+        l[0] = l[1] = 1;
+
+        if (*r) {
+            r++;
+
+            switch (*r) {
+            case L'?': l[0] = 0; l[1] = 1; r++; break;
+            case L'*': l[0] = 0; l[1] = 0; r++; break;
+            case L'+': l[0] = 1; l[1] = 0; r++; break;
+            case L'{': /* .... */ break;
+            }
+        }
 
         if (c > oc) {
             cnt++;
