@@ -172,15 +172,15 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
         }
         else {
             /* not matched; were previous matches enough? */
-            if (cnt >= l[0]) {
-                /* yes; keep moving from further position seen */
-                cnt = 0;
-                frx = r;
-            }
-            else {
+            if (cnt < l[0]) {
                 /* no; move to a possible alternative */
                 c = 0;
                 frx = skip_past(r, L'|');
+            }
+            else {
+                /* yes; keep moving from further position seen */
+                cnt = 0;
+                frx = r;
             }
         }
     }
