@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     /* * */
     do_test(L".* 1", L"g.*text", L"this string has text", L"g has text");
     do_test(L"i* 1", L"stri*ng", L"this string has text", L"string");
-    do_test(L".* is greedy", L"str.*ng", L"this string has string text", L"string has string");
+    do_test(L".* is non greedy", L"str.*ng", L"this string has string text", L"string");
     do_test(L"More than 1 .*", L"str.*ng.*x", L"this string has string text", L"string has string tex");
     do_test(L"* match to the end", L"one *world", L"one world", L"one world");
     do_test(L"More *", L"a*bc", L"aaabc", L"aaabc");

@@ -101,73 +101,73 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
 
     for (;;) {
         int l[2], oc = c;
-        wchar_t *nrx = frx;
+        wchar_t *r = frx;
 
         /* nothing more to match? go */
-        if (*nrx == L'\0' || *nrx == L')' || tx[c] == L'\0')
+        if (*r == L'\0' || *r == L')' || tx[c] == L'\0')
             break;
 
         /* end of alternate set? */
-        if (*nrx == L'|') {
-            nrx = skip_to(nrx, L')');
+        if (*r == L'|') {
+            r = skip_to(r, L')');
             break;
         }
 
-        if (*nrx == L'(') {
+        if (*r == L'(') {
             /* sub-regexp */
             int ii = 0;
 
-            nrx++;
-            c += match_here(nrx, &tx[c], 0, &ii);
-            nrx += ii;
+            r++;
+            c += match_here(r, &tx[c], 0, &ii);
+            r += ii;
         }
         else
-        if (*nrx == L'[') {
+        if (*r == L'[') {
             int f = 0;
 
-            if (nrx[1] == L'^') {
-                nrx = in_set(nrx + 2, tx[c], &f);
+            if (r[1] == L'^') {
+                r = in_set(r + 2, tx[c], &f);
                 f = !f;
             }
             else
-                nrx = in_set(nrx + 1, tx[c], &f);
+                r = in_set(r + 1, tx[c], &f);
 
             if (f)
                 c++;
         }
         else
-        if (*nrx == L'.')
+        if (*r == L'.')
             c++;
         else {
-            if (*nrx == L'\\')
-                nrx++;
+            if (*r == L'\\')
+                r++;
 
-            if (*nrx == tx[c])
+            if (*r == tx[c])
                 c++;
         }
 
-        nrx = parse_quantifier(nrx, l);
+        r = parse_quantifier(r, l);
 
         if (c > oc) {
             cnt++;
 
             /* upper limit not reached? try searching the same again one more time */
             if (!l[1] || cnt < l[1]) {
-                trx = nrx;
+                trx = r;
 
                 if (l[0] == 0) {
                     int ii = 0, nc;
 
-                    if ((nc = match_here(nrx, tx, c, &ii)) > c) {
+                    if ((nc = match_here(r, tx, c, &ii)) > c) {
                         c = nc;
-                        frx = nrx + ii;
+                        frx = r + ii;
                     }
                 }
             }
             else {
                 /* start with a different thing and keep moving */
                 cnt = 0;
-                frx = nrx;
+                frx = r;
             }
         }
         else {
@@ -180,7 +180,7 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
             else {
                 /* no; move to a possible alternative */
                 c = 0;
-                frx = skip_past(nrx, L'|');
+                frx = skip_past(r, L'|');
             }
         }
     }
