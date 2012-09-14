@@ -76,6 +76,19 @@ static wchar_t *skip_past(wchar_t *rx, wchar_t c)
 }
 
 
+static wchar_t *parse_int(wchar_t *rx, int *v)
+{
+    *v = 0;
+
+    while (*rx >= L'0' && *rx <= L'9') {
+        *v = (*v * 10) + (*rx - L'0');
+        rx++;
+    }
+
+    return rx;
+}
+
+
 static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
 {
     wchar_t *frx = rx;
@@ -138,7 +151,15 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
             case L'?': min = 0; max = 1; r++; break;
             case L'*': min = 0; max = 0; r++; break;
             case L'+': min = 1; max = 0; r++; break;
-            case L'{': /* .... */ break;
+            case L'{':
+                r = parse_int(r + 1, &min);
+                if (*r == L',')
+                    r = parse_int(r + 1, &max);
+                else
+                    max = min;
+
+                r++;
+                break;
             }
         }
 
