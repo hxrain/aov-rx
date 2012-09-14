@@ -48,25 +48,6 @@ static wchar_t *in_set(wchar_t *rx, wchar_t c, int *found)
 }
 
 
-static wchar_t *parse_quantifier(wchar_t *rx, int lim[2])
-{
-    lim[0] = 1; lim[1] = 1;
-
-    if (*rx) {
-        rx++;
-
-        switch (*rx) {
-        case L'?': lim[0] = 0; lim[1] = 1; rx++; break;
-        case L'*': lim[0] = 0; lim[1] = 0; rx++; break;
-        case L'+': lim[0] = 1; lim[1] = 0; rx++; break;
-        case L'{': /* .... */ break;
-        }
-    }
-
-    return rx;
-}
-
-
 static wchar_t *skip_past(wchar_t *rx, wchar_t c);
 
 static wchar_t *skip_to(wchar_t *rx, wchar_t c)
@@ -101,8 +82,9 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
     int cnt = 0;
 
     for (;;) {
-        int l[2], oc = c;
+        int oc = c;
         wchar_t *r = frx;
+        int min = 1, max = 1;
 
         /* nothing more to match? go */
         if (*r == L'\0' || *r == L')' || tx[c] == L'\0')
@@ -148,17 +130,14 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
                 c++;
         }
 
-//        r = parse_quantifier(r, l);
         /* parse quantifier */
-        l[0] = l[1] = 1;
-
         if (*r) {
             r++;
 
             switch (*r) {
-            case L'?': l[0] = 0; l[1] = 1; r++; break;
-            case L'*': l[0] = 0; l[1] = 0; r++; break;
-            case L'+': l[0] = 1; l[1] = 0; r++; break;
+            case L'?': min = 0; max = 1; r++; break;
+            case L'*': min = 0; max = 0; r++; break;
+            case L'+': min = 1; max = 0; r++; break;
             case L'{': /* .... */ break;
             }
         }
@@ -167,8 +146,8 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
             cnt++;
 
             /* upper limit not reached? try searching the same again one more time */
-            if (!l[1] || cnt < l[1]) {
-                if (l[0] == 0) {
+            if (!max || cnt < max) {
+                if (min == 0) {
                     int ii = 0, nc;
 
                     if ((nc = match_here(r, tx, c, &ii)) > c) {
@@ -185,7 +164,7 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
         }
         else {
             /* not matched; were previous matches enough? */
-            if (cnt < l[0]) {
+            if (cnt < min) {
                 /* no; move to a possible alternative */
                 c = 0;
                 frx = skip_past(r, L'|');
