@@ -172,14 +172,12 @@ int main(int argc, char *argv[])
     do_test(L"Alt strings 2", L"(abc|def)1", L"try abc1 now", L"abc1");
 
     /* substrings */
-#if 0
     do_test(L"Substrs and * 0", L"Rem(ark)* comment", L"Rem comment", L"Rem comment");
     do_test(L"Substrs and * 1", L"Rem(ark)* comment", L"Remarkark comment", L"Remarkark comment");
     do_test(L"Substrs and * 2", L"Rem(ark)* comment", L"Remark comment", L"Remark comment");
     do_test(L"Substrs and * 3", L"Rem(ark)* comment", L"<!-- Rem comment -->", L"Rem comment");
     do_test(L"Substrs and ? 0", L"Rem(ark)? comment", L"Rem comment", L"Rem comment");
     do_test(L"Substrs and ? 1", L"Rem(ark)? comment", L"Remark comment", L"Remark comment");
-#endif
 
     do_test(L"More sets 0", L"'[^']*'", L"I have here a 'string' between quotes", L"'string'");
     do_test(L"More sets 1", L"'[^']*'", L"I have here a '' between quotes", L"''");
