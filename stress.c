@@ -114,18 +114,18 @@ int main(int argc, char *argv[])
     do_test(L"Matching $ 1", L"text$", L"this string has text", L"text");
     do_test(L"Matching $ 2", L"text$", L"this string has text alone", L"");
 
-#if 0
     /* parens */
-    do_test(L"Paren 1", L"(http|ftp)://", L"http://triptico.com", 1, L"http://");
-    do_test(L"Paren 2", L"(http|ftp)://", L"ftp://triptico.com", 1, L"ftp://");
-    do_test(L"Paren 3", L"(http|ftp)s?://", L"http://triptico.com", 1, L"http://");
-    do_test(L"Paren 4", L"(http|ftp)s?://", L"ftp://triptico.com", 1, L"ftp://");
-    do_test(L"Paren 5", L"(http|ftp)s?://", L"ftps://triptico.com", 1, L"ftps://");
-    do_test(L"Paren 6", L"(gopher|http|ftp)s?://", L"http://triptico.com", 1, L"http://");
-    do_test(L"Paren 7", L".(es|com)$", L"http://triptico.com", 1, L".com");
-    do_test(L"Paren 8", L".(es|com)$", L"http://triptico.es", 1, L".es");
-    do_test(L"Paren 9", L".(es|com)$", L"http://triptico.org", 0, L"");
+    do_test(L"Paren 1", L"(http|ftp)://",           L"http://triptico.com", L"http://");
+    do_test(L"Paren 2", L"(http|ftp)://",           L"ftp://triptico.com", L"ftp://");
+    do_test(L"Paren 3", L"(http|ftp)s?://",         L"http://triptico.com", L"http://");
+    do_test(L"Paren 4", L"(http|ftp)s?://",         L"ftp://triptico.com", L"ftp://");
+    do_test(L"Paren 5", L"(http|ftp)s?://",         L"ftps://triptico.com", L"ftps://");
+    do_test(L"Paren 6", L"(gopher|http|ftp)s?://",  L"http://triptico.com", L"http://");
+    do_test(L"Paren 7", L".(es|com)$",              L"http://triptico.com", L".com");
+    do_test(L"Paren 8", L".(es|com)$",              L"http://triptico.es", L".es");
+    do_test(L"Paren 9", L".(es|com)$",              L"http://triptico.org", L"");
 
+#if 0
     /* + */
     do_test(L"+ 0 (really *)", L"one *world", L"oneworld is enough", 1, L"oneworld");
     do_test(L"+ 1", L"one +world", L"oneworld", 0, L"");
@@ -140,14 +140,14 @@ int main(int argc, char *argv[])
 #endif
 
     /* escaped chars */
-    do_test(L"esc 0 (really ?)", L"ready?", L"ready!", L"ready");
-    do_test(L"esc 1", L"ready\\?", L"ready!", L"");
-    do_test(L"esc 2", L"ready\\?", L"ready?", L"ready?");
-    do_test(L"esc 3", L"triptico.com", L"tripticoxcom", L"tripticoxcom");
-    do_test(L"esc 4", L"triptico\\.com", L"tripticoxcom", L"");
-    do_test(L"esc 5", L"triptico\\.com", L"triptico.com", L"triptico.com");
-    do_test(L"esc 6", L"\n", L"string without newlines", L"");
-    do_test(L"esc 7", L"\n", L"I'm\nbroken", L"\n");
+    do_test(L"esc 0 (really ?)", L"ready?",         L"ready!", L"ready");
+    do_test(L"esc 1",            L"ready\\?",       L"ready!", L"");
+    do_test(L"esc 2",            L"ready\\?",       L"ready?", L"ready?");
+    do_test(L"esc 3",            L"triptico.com",   L"tripticoxcom", L"tripticoxcom");
+    do_test(L"esc 4",            L"triptico\\.com", L"tripticoxcom", L"");
+    do_test(L"esc 5",            L"triptico\\.com", L"triptico.com", L"triptico.com");
+    do_test(L"esc 6",            L"\n",             L"string without newlines", L"");
+    do_test(L"esc 7",            L"\n",             L"I'm\nbroken", L"\n");
 
     /* square bracket sets */
     do_test(L"[] 0", L"[^a-c]",     L"z", L"z");
@@ -165,19 +165,19 @@ int main(int argc, char *argv[])
     do_test(L"[] and + 0", L"[a-z]+",       L"1234 string 456", L"string");
     do_test(L"[] and + 1", L"[a-z]+:",      L"1234 string key: value 456", L"key:");
 
-#if 0
     /* alternate strings */
-    do_test(L"Alt strings 0", L"(abc|def)1", L"try abf1 now", 0, L"");
-    do_test(L"Alt strings 1", L"(abc|def)1", L"try def1 now", 1, L"def1");
-    do_test(L"Alt strings 2", L"(abc|def)1", L"try abc1 now", 1, L"abc1");
+    do_test(L"Alt strings 0", L"(abc|def)1", L"try abf1 now", L"");
+    do_test(L"Alt strings 1", L"(abc|def)1", L"try def1 now", L"def1");
+    do_test(L"Alt strings 2", L"(abc|def)1", L"try abc1 now", L"abc1");
 
     /* substrings */
-    do_test(L"Substrs and * 0", L"Rem(ark)* comment", L"Rem comment", 1, L"Rem comment");
-    do_test(L"Substrs and * 1", L"Rem(ark)* comment", L"Remarkark comment", 1, L"Remarkark comment");
-    do_test(L"Substrs and * 2", L"Rem(ark)* comment", L"Remark comment", 1, L"Remark comment");
-    do_test(L"Substrs and * 3", L"Rem(ark)* comment", L"<!-- Rem comment -->", 1, L"Rem comment");
-    do_test(L"Substrs and ? 0", L"Rem(ark)? comment", L"Rem comment", 1, L"Rem comment");
-    do_test(L"Substrs and ? 1", L"Rem(ark)? comment", L"Remark comment", 1, L"Remark comment");
+#if 0
+    do_test(L"Substrs and * 0", L"Rem(ark)* comment", L"Rem comment", L"Rem comment");
+    do_test(L"Substrs and * 1", L"Rem(ark)* comment", L"Remarkark comment", L"Remarkark comment");
+    do_test(L"Substrs and * 2", L"Rem(ark)* comment", L"Remark comment", L"Remark comment");
+    do_test(L"Substrs and * 3", L"Rem(ark)* comment", L"<!-- Rem comment -->", L"Rem comment");
+    do_test(L"Substrs and ? 0", L"Rem(ark)? comment", L"Rem comment", L"Rem comment");
+    do_test(L"Substrs and ? 1", L"Rem(ark)? comment", L"Remark comment", L"Remark comment");
 #endif
 
     do_test(L"More sets 0", L"'[^']*'", L"I have here a 'string' between quotes", L"'string'");

@@ -108,7 +108,7 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
 
         /* end of alternate set? */
         if (*r == L'|') {
-            r = skip_to(r, L')');
+            frx = skip_to(r, L')');
             break;
         }
 
