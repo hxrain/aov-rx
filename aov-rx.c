@@ -48,9 +48,9 @@ static wchar_t *in_set(wchar_t *rx, wchar_t c, int *found)
 }
 
 
-static wchar_t *parse_quantifier(wchar_t *rx, int *limit, int m)
+static wchar_t *parse_quantifier(wchar_t *rx, int lim[2])
 {
-    int lim[2] = { 1, 1 };
+    lim[0] = 1; lim[1] = 1;
 
     if (*rx) {
         rx++;
@@ -62,8 +62,6 @@ static wchar_t *parse_quantifier(wchar_t *rx, int *limit, int m)
         case L'{': /* .... */ break;
         }
     }
-
-    *limit = lim[m];
 
     return rx;
 }
@@ -102,7 +100,7 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
     int cnt = 0;
 
     for (;;) {
-        int l, oc = c;
+        int l[2], oc = c;
 
         /* nothing more to match? go */
         if (*nrx == L'\0' || *nrx == L')' || tx[c] == L'\0')
@@ -147,13 +145,13 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
                 c++;
         }
 
-        nrx = parse_quantifier(nrx, &l, c > oc);
+        nrx = parse_quantifier(nrx, l);
 
         if (c > oc) {
             cnt++;
 
             /* upper limit not reached? try searching the same again one more time */
-            if (!l || cnt < l) {
+            if (!l[1] || cnt < l[1]) {
                 trx = nrx;
                 nrx = rx;
             }
@@ -164,7 +162,7 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
         }
         else {
             /* not matched; were previous matches enough? */
-            if (cnt >= l) {
+            if (cnt >= l[0]) {
                 /* yes; keep moving from further position seen */
                 nrx = trx;
                 cnt = 0;
