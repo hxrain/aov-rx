@@ -128,19 +128,17 @@ int main(int argc, char *argv[])
     do_test(L"Paren 8", L".(es|com)$",              L"http://triptico.es", L".es");
     do_test(L"Paren 9", L".(es|com)$",              L"http://triptico.org", L"");
 
-#if 0
     /* + */
-    do_test(L"+ 0 (really *)", L"one *world", L"oneworld is enough", 1, L"oneworld");
-    do_test(L"+ 1", L"one +world", L"oneworld", 0, L"");
-    do_test(L"+ 2", L"one +world", L"one world", 1, L"one world");
-    do_test(L"+ 3", L"one +world", L"one    world", 1, L"one    world");
-    do_test(L"+ 4", L"one +world", L"oneworld is enough", 0, L"");
-    do_test(L"+ 5", L"one +world", L"one world is enough", 1, L"one world");
-    do_test(L"+ 6", L"one +world", L"one    world is enough", 1, L"one    world");
-    do_test(L"+ 7", L"one +world", L"I say oneworld is enough", 0, L"");
-    do_test(L"+ 8", L"one +world", L"I say one world is enough", 1, L"one world");
-    do_test(L"+ 9", L"one +world", L"I say one    world is enough", 1, L"one    world");
-#endif
+    do_test(L"+ 0 (really *)", L"one *world",   L"oneworld is enough", L"oneworld");
+    do_test(L"+ 1", L"one +world",              L"oneworld", L"");
+    do_test(L"+ 2", L"one +world",              L"one world", L"one world");
+    do_test(L"+ 3", L"one +world",              L"one    world", L"one    world");
+    do_test(L"+ 4", L"one +world",              L"oneworld is enough", L"");
+    do_test(L"+ 5", L"one +world",              L"one world is enough", L"one world");
+    do_test(L"+ 6", L"one +world",              L"one    world is enough", L"one    world");
+    do_test(L"+ 7", L"one +world",              L"I say oneworld is enough", L"");
+    do_test(L"+ 8", L"one +world",              L"I say one world is enough", L"one world");
+    do_test(L"+ 9", L"one +world",              L"I say one    world is enough", L"one    world");
 
     /* escaped chars */
     do_test(L"esc 0 (really ?)", L"ready?",         L"ready!", L"ready");
@@ -200,6 +198,8 @@ int main(int argc, char *argv[])
     do_test(L"Brace matches 11", L"a.{0,5}c",               L"abc", L"abc");
     do_test(L"Brace matches 12", L"a.{0,5}c",               L"abcdec", L"abc");
     do_test(L"Brace matches 13", L"a.{0,5}c",               L"abcdecfghic", L"abc");
+
+    do_test(L"Brace matches 20", L".{5}",                   L"abcdefghijklmnopqrs", L"abcde");
 
     do_test(L"More * at the end", L"a*", L"", L"");
 
