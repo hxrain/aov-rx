@@ -178,14 +178,16 @@ int main(int argc, char *argv[])
     do_test(L"Substrs and * 3", L"Rem(ark)* comment", L"<!-- Rem comment -->", 1, L"Rem comment");
     do_test(L"Substrs and ? 0", L"Rem(ark)? comment", L"Rem comment", 1, L"Rem comment");
     do_test(L"Substrs and ? 1", L"Rem(ark)? comment", L"Remark comment", 1, L"Remark comment");
+#endif
 
-    do_test(L"More sets 0", L"'[^']*'", L"I have here a 'string' between quotes", 1, L"'string'");
-    do_test(L"More sets 1", L"'[^']*'", L"I have here a '' between quotes", 1, L"''");
-    do_test(L"More sets 2", L"[a-z][a-z]* *: *[1-9][0-9]*", L"key:15 # comment", 1, L"key:15");
-    do_test(L"More sets 3", L"[a-z][a-z]* *: *[1-9][0-9]*", L"key : 123456 # comment", 1, L"key : 123456");
-    do_test(L"More sets 4", L"[a-z][a-z]* *: *[1-9][0-9]*", L"k: 6000", 1, L"k: 6000");
-    do_test(L"More sets 5", L"[a-z][a-z]* *: *[1-9][0-9]*", L"key: 1", 1, L"key: 1");
+    do_test(L"More sets 0", L"'[^']*'", L"I have here a 'string' between quotes", L"'string'");
+    do_test(L"More sets 1", L"'[^']*'", L"I have here a '' between quotes", L"''");
+    do_test(L"More sets 2", L"[a-z][a-z]* *: *[1-9][0-9]*", L"key:15 # comment", L"key:15");
+    do_test(L"More sets 3", L"[a-z][a-z]* *: *[1-9][0-9]*", L"key : 123456 # comment", L"key : 123456");
+    do_test(L"More sets 4", L"[a-z][a-z]* *: *[1-9][0-9]*", L"k: 6000", L"k: 6000");
+    do_test(L"More sets 5", L"[a-z][a-z]* *: *[1-9][0-9]*", L"key: 1", L"key: 1");
 
+#if 0
     do_test(L"Brace matches 1 (like ?)", L"https{0,1}://", L"http://triptico.com", 1, L"http://");
     do_test(L"Brace matches 2 (like ?)", L"https{0,1}://", L"https://triptico.com", 1, L"https://");
     do_test(L"Brace matches 3 (like *)", L"a{0,}bc", L"aaabc", 1, L"aaabc");
