@@ -17,36 +17,29 @@ int verbose = 0;
 char *failed_msgs[5000];
 int i_failed_msgs = 0;
 
-void _do_test(wchar_t *desc, wchar_t *rx, wchar_t *txt,
-                int exp_i, wchar_t *exp_s, int src_line)
+wchar_t *match(wchar_t *rx, wchar_t *tx, int *size);
+
+void _do_test(wchar_t *desc, wchar_t *rx, wchar_t *tx, wchar_t *exp_s, int src_line)
 {
-    int begin, size;
+    wchar_t *stx, *stx2;
+    int size;
 
     tests++;
 
-    begin = 0;
-    if (aov_rx_match(rx, txt, &begin, &size) == exp_i) {
+    stx = match(rx, tx, &size);
+    stx2 = wcsdup(stx);
+    stx2[size] = 0;
+
+    if (wcscmp(stx2, exp_s) == 0) {
         /* match: test now the string */
-        if (!exp_i || wcsncmp(txt + begin, exp_s, size) == 0) {
-            oks++;
+        oks++;
 
-            if (verbose)
-                wprintf(L"stress.c:%d: OK (test %d, \"%ls\")\n", src_line, tests, desc);
-        }
-        else {
-            wchar_t tmp[16000];
-
-            wcsncpy(tmp, txt + begin, size);
-            tmp[size] = L'\0';
-
-            /* different expected strings */
-            wprintf(L"stress.c:%d: (test %d, \"%ls\") *** Failed *** -- ", src_line, tests, desc);
-            wprintf(L"got [%ls], expected [%ls]\n", tmp, exp_s);
-        }
+        if (verbose)
+            wprintf(L"stress.c:%d: OK (test %d, \"%ls\")\n", src_line, tests, desc);
     }
     else {
-        wprintf(L"stress.c:%d: (test %d, \"%ls\") *** Failed *** -- NOT MATCH", src_line, tests, desc);
-        wprintf(L", expected [%ls]\n", exp_s);
+        wprintf(L"stress.c:%d: (test %d, \"%ls\") *** Failed ***", src_line, tests, desc);
+        wprintf(L", size: %d, stx: \"%ls\", expected \"%ls\"\n", size, stx, exp_s);
     }
 }
 
@@ -71,7 +64,7 @@ int test_summary(void)
 }
 
 
-#define do_test(d, r, t, i, s) _do_test(d, r, t, i, s, __LINE__)
+#define do_test(d, r, t, s) _do_test(d, r, t, s, __LINE__)
 
 
 wchar_t *match(wchar_t *rx, wchar_t *tx, int *size);
@@ -84,48 +77,46 @@ int main(int argc, char *argv[])
     if (argc > 1 && strcmp(argv[1], "-v") == 0)
         verbose = 1;
 
-    int s;
-    match(L"abcde", L"abc", &s);
-    match(L"(abc)+", L"abc", &s);
-    match(L"(abc)+", L"abcabc", &s);
-    match(L"yes|no", L"yes", &s);
-    match(L"yes|no", L"no", &s);
-    match(L"yes|you", L"you", &s);
-    match(L"[ba0-9]+", L"12a34c", &s);
-    match(L"[0-9]+", L"12a34", &s);
-    match(L"test.*", L"test", &s);
-    match(L"test", L"test", &s);
-    match(L".*", L"", &s);
-
-    do_test(L"empty .*", L".*", L"", 1, L"");
+    do_test(L"abcde", L"abcde", L"abc", L"abc");
+    do_test(L"(abc)+ 1", L"(abc)+", L"abc", L"abc");
+    do_test(L"(abc)+ 2", L"(abc)+", L"abcabc",L"abcabc");
+    do_test(L"yes|no 1", L"yes|no", L"yes", L"yes");
+    do_test(L"yes|no 2", L"yes|no", L"no", L"no");
+    do_test(L"yes|you", L"yes|you", L"you", L"you");
+    do_test(L"[ba0-9]+", L"[ba0-9]+", L"12a34c", L"12a34");
+    do_test(L"[0-9]+", L"[0-9]+", L"12a34", L"12");
+    do_test(L"test.*", L"test.*", L"test", L"test");
+    do_test(L"test", L"test", L"test", L"test");
+    do_test(L".*", L".*", L"", L"");
 
     /* ^ */
-    do_test(L"Non-matching ^", L"^text", L"this string has text", 0, L"");
-    do_test(L"Matching ^", L"^this", L"this string has text", 1, L"this");
+    do_test(L"Non-matching ^", L"^text", L"this string has text", L"");
+    do_test(L"Matching ^", L"^this", L"this string has text", L"this");
 
     /* basic */
-    do_test(L"Basic string", L"string", L"this string has text", 1, L"string");
-    do_test(L"Dots", L"h.la", L"hola", 1, L"hola");
+    do_test(L"Basic string", L"string", L"this string has text", L"string");
+    do_test(L"Dots", L"h.la", L"hola", L"hola");
 
     /* * */
-    do_test(L".* 1", L"g.*text", L"this string has text", 1, L"g has text");
-    do_test(L"i* 1", L"stri*ng", L"this string has text", 1, L"string");
-    do_test(L".* is greedy", L"str.*ng", L"this string has string text", 1, L"string has string");
-    do_test(L"More than 1 .*", L"str.*ng.*x", L"this string has string text", 1, L"string has string tex");
-    do_test(L"* match to the end", L"one *world", L"one world", 1, L"one world");
-    do_test(L"More *", L"a*bc", L"aaabc", 1, L"aaabc");
+    do_test(L".* 1", L"g.*text", L"this string has text", L"g has text");
+    do_test(L"i* 1", L"stri*ng", L"this string has text", L"string");
+    do_test(L".* is greedy", L"str.*ng", L"this string has string text", L"string has string");
+    do_test(L"More than 1 .*", L"str.*ng.*x", L"this string has string text", L"string has string tex");
+    do_test(L"* match to the end", L"one *world", L"one world", L"one world");
+    do_test(L"More *", L"a*bc", L"aaabc", L"aaabc");
 
     /* ? */
-    do_test(L"? 1", L"https?://", L"http://triptico.com", 1, L"http://");
-    do_test(L"? 2", L"https?://", L"https://triptico.com", 1, L"https://");
-    do_test(L"? 3", L"hos?la", L"hocla", 0, L"");
-    do_test(L"? 4", L"hos?la", L"hola", 1, L"hola");
-    do_test(L"? 5", L"hos?la", L"hosla", 1, L"hosla");
+    do_test(L"? 1", L"https?://", L"http://triptico.com", L"http://");
+    do_test(L"? 2", L"https?://", L"https://triptico.com", L"https://");
+    do_test(L"? 3", L"hos?la", L"hocla", L"");
+    do_test(L"? 4", L"hos?la", L"hola", L"hola");
+    do_test(L"? 5", L"hos?la", L"hosla", L"hosla");
 
     /* $ */
-    do_test(L"Matching $ 1", L"text$", L"this string has text", 1, L"text");
-    do_test(L"Matching $ 2", L"text$", L"this string has text alone", 0, L"");
+    do_test(L"Matching $ 1", L"text$", L"this string has text", L"text");
+    do_test(L"Matching $ 2", L"text$", L"this string has text alone", L"");
 
+#if 0
     /* parens */
     do_test(L"Paren 1", L"(http|ftp)://", L"http://triptico.com", 1, L"http://");
     do_test(L"Paren 2", L"(http|ftp)://", L"ftp://triptico.com", 1, L"ftp://");
@@ -202,8 +193,9 @@ int main(int argc, char *argv[])
     do_test(L"Brace matches 11", L"a.{0,5}c", L"abc", 1, L"abc");
     do_test(L"Brace matches 12", L"a.{0,5}c", L"abcdec", 1, L"abcdec");
     do_test(L"Brace matches 13", L"a.{0,5}c", L"abcdecfghic", 1, L"abc");
+#endif
 
-    do_test(L"More * at the end", L"a*", L"", 1, L"");
+    do_test(L"More * at the end", L"a*", L"", L"");
 
     return test_summary();
 }
