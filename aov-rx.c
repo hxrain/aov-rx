@@ -71,13 +71,15 @@ static wchar_t *skip_past(wchar_t *rx, wchar_t c);
 
 static wchar_t *skip_to(wchar_t *rx, wchar_t c)
 {
-    rx++;
+    if (*rx) {
+        rx++;
 
-    while (*rx && *rx != c) {
-        if (*rx == L'(')
-            rx = skip_past(rx, L')');
-        else
-            rx++;
+        while (*rx && *rx != L'$' && *rx != L')' && *rx != c) {
+            if (*rx == L'(')
+                rx = skip_past(rx, L')');
+            else
+                rx++;
+        }
     }
 
     return rx;
@@ -87,7 +89,7 @@ static wchar_t *skip_to(wchar_t *rx, wchar_t c)
 static wchar_t *skip_past(wchar_t *rx, wchar_t c)
 {
     rx = skip_to(rx, c);
-    if (*rx) rx++;
+    if (*rx == c) rx++;
 
     return rx;
 }

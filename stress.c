@@ -75,6 +75,9 @@ int main(int argc, char *argv[])
     if (argc > 1 && strcmp(argv[1], "-v") == 0)
         verbose = 1;
 
+    do_test(L"basic 0", L".a", L"b", L"");
+    do_test(L"basic 1", L".a$", L"b", L"");
+
     do_test(L"abcde", L"abcde", L"abc", L"abc");
     do_test(L"(abc)+ 1", L"(abc)+", L"abc", L"abc");
     do_test(L"(abc)+ 2", L"(abc)+", L"abcabc",L"abcabc");
