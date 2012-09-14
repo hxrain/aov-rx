@@ -95,12 +95,13 @@ static wchar_t *skip_past(wchar_t *rx, wchar_t c)
 
 static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
 {
-    wchar_t *nrx = rx;
+    wchar_t *frx = rx;
     wchar_t *trx = rx;
     int cnt = 0;
 
     for (;;) {
         int l[2], oc = c;
+        wchar_t *nrx = frx;
 
         /* nothing more to match? go */
         if (*nrx == L'\0' || *nrx == L')' || tx[c] == L'\0')
@@ -153,29 +154,38 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
             /* upper limit not reached? try searching the same again one more time */
             if (!l[1] || cnt < l[1]) {
                 trx = nrx;
-                nrx = rx;
+
+                if (l[0] == 0) {
+                    int ii = 0, nc;
+
+                    if ((nc = match_here(nrx, tx, c, &ii)) > c) {
+                        c = nc;
+                        frx = nrx + ii;
+                    }
+                }
             }
             else {
                 /* start with a different thing and keep moving */
                 cnt = 0;
+                frx = nrx;
             }
         }
         else {
             /* not matched; were previous matches enough? */
             if (cnt >= l[0]) {
                 /* yes; keep moving from further position seen */
-                nrx = trx;
                 cnt = 0;
+                frx = trx;
             }
             else {
                 /* no; move to a possible alternative */
                 c = 0;
-                nrx = skip_past(nrx, L'|');
+                frx = skip_past(nrx, L'|');
             }
         }
     }
 
-    *i = nrx - rx;
+    *i = frx - rx;
 
     return c;
 }
