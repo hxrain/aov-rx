@@ -17,8 +17,6 @@ int verbose = 0;
 char *failed_msgs[5000];
 int i_failed_msgs = 0;
 
-wchar_t *match(wchar_t *rx, wchar_t *tx, int *size);
-
 void _do_test(wchar_t *desc, wchar_t *rx, wchar_t *tx, wchar_t *exp_s, int src_line)
 {
     wchar_t *stx, *stx2;
@@ -26,7 +24,7 @@ void _do_test(wchar_t *desc, wchar_t *rx, wchar_t *tx, wchar_t *exp_s, int src_l
 
     tests++;
 
-    stx = match(rx, tx, &size);
+    stx = aov_match(rx, tx, &size);
     stx2 = wcsdup(stx);
     stx2[size] = 0;
 
