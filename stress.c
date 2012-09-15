@@ -75,20 +75,21 @@ int main(int argc, char *argv[])
     if (argc > 1 && strcmp(argv[1], "-v") == 0)
         verbose = 1;
 
-    do_test(L"basic 0", L".a", L"b", L"");
+    do_test(L"basic 2", L"a+",  L"a", L"a");
+    do_test(L"basic 0", L".a",  L"b", L"");
     do_test(L"basic 1", L".a$", L"b", L"");
 
-    do_test(L"abcde", L"abcde", L"abc", L"abc");
-    do_test(L"(abc)+ 1", L"(abc)+", L"abc", L"abc");
-    do_test(L"(abc)+ 2", L"(abc)+", L"abcabc",L"abcabc");
-    do_test(L"yes|no 1", L"yes|no", L"yes", L"yes");
-    do_test(L"yes|no 2", L"yes|no", L"no", L"no");
-    do_test(L"yes|you", L"yes|you", L"you", L"you");
-    do_test(L"[ba0-9]+", L"[ba0-9]+", L"12a34c", L"12a34");
-    do_test(L"[0-9]+", L"[0-9]+", L"12a34", L"12");
-    do_test(L"test.*", L"test.*", L"test", L"test");
-    do_test(L"test", L"test", L"test", L"test");
-    do_test(L".*", L".*", L"", L"");
+    do_test(L"abcde", L"abc",           L"abcde", L"abc");
+    do_test(L"(abc)+ 1", L"(abc)+",     L"abc", L"abc");
+    do_test(L"(abc)+ 2", L"(abc)+",     L"abcabc",L"abcabc");
+    do_test(L"yes|no 1", L"yes|no",     L"yes", L"yes");
+    do_test(L"yes|no 2", L"yes|no",     L"no", L"no");
+    do_test(L"yes|you", L"yes|you",     L"you", L"you");
+    do_test(L"[ba0-9]+", L"[ba0-9]+",   L"12a34c", L"12a34");
+    do_test(L"[0-9]+", L"[0-9]+",       L"12a34", L"12");
+    do_test(L"test.*", L"test.*",       L"test", L"test");
+    do_test(L"test", L"test",           L"test", L"test");
+    do_test(L".*", L".*",               L"", L"");
 
     /* ^ */
     do_test(L"Non-matching ^", L"^text", L"this string has text", L"");

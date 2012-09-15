@@ -97,54 +97,56 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
     for (;;) {
         int oc = c;
         wchar_t *r = frx;
+        wchar_t *t = &tx[c];
         int min = 1, max = 1;
 
-        /* nothing more to match? go */
-        if (*r == L'\0' || *r == L')' || tx[c] == L'\0')
+        if (*r == L'\0' || *r == L')')      /* end of match */
             break;
 
-        /* end of alternate set? */
-        if (*r == L'|') {
+        if (*t == L'\0') {               /* out of text */
+            if (*r != L'$')
+                c = 0;
+
+            break;
+        }
+
+        if (*r == L'|') {                   /* end of alternate set */
             frx = skip_to(r, L')');
             break;
         }
 
-        if (*r == L'(') {
-            /* sub-regexp */
+        if (*r == L'(') {                   /* sub-regexp */
             int ii = 0;
 
             r++;
-            c += match_here(r, &tx[c], 0, &ii);
+            c += match_here(r, t, 0, &ii);
             r += ii;
         }
         else
-        if (*r == L'[') {
-            /* set */
+        if (*r == L'[') {                   /* set */
             int f = 0;
 
             if (r[1] == L'^') {
-                r = in_set(r + 2, tx[c], &f);
+                r = in_set(r + 2, *t, &f);
                 f = !f;
             }
             else
-                r = in_set(r + 1, tx[c], &f);
+                r = in_set(r + 1, *t, &f);
 
             if (f)
                 c++;
         }
         else
-        if (*r == L'.')
+        if (*r == L'.')                     /* any char */
             c++;
-        else {
-            if (*r == L'\\')
-                r++;
+        else
+        if (*r == L'\\' && *++r == *t)      /* escaped char */
+            c++;
+        else
+        if (*r == *t)                       /* exact char */
+            c++;
 
-            if (*r == tx[c])
-                c++;
-        }
-
-        /* parse quantifier */
-        if (*r) {
+        if (*r) {                           /* parse quantifier */
             r++;
 
             switch (*r) {
