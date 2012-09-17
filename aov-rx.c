@@ -178,11 +178,8 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
                         frx = r + ii;
                     }
                 }
-            }
-            else {
-                /* start with a different thing and keep moving */
-                cnt = 0;
-                frx = r;
+
+                continue;
             }
         }
         else {
@@ -191,13 +188,13 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
                 /* no; move to a possible alternative */
                 c = 0;
                 frx = skip_past(r, L'|');
-            }
-            else {
-                /* yes; keep moving from further position seen */
-                cnt = 0;
-                frx = r;
+
+                continue;
             }
         }
+
+        cnt = 0;
+        frx = r;
     }
 
     *i = frx - rx;
