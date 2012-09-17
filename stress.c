@@ -75,10 +75,12 @@ int main(int argc, char *argv[])
     if (argc > 1 && strcmp(argv[1], "-v") == 0)
         verbose = 1;
 
-    do_test(L"basic 2", L"a+",  L"a", L"a");
-    do_test(L"basic 3", L"a.*",  L"a", L"a");
-    do_test(L"basic 0", L".a",  L"b", L"");
-    do_test(L"basic 1", L".a$", L"b", L"");
+    do_test(L"basic 0", L"a",       L"a", L"a");
+    do_test(L"basic 1", L"a*",      L"a", L"a");
+    do_test(L"basic 2", L"a+",      L"a", L"a");
+    do_test(L"basic 3", L"a.*",     L"a", L"a");
+    do_test(L"basic 4", L".a",      L"b", L"");
+    do_test(L"basic 5", L".a$",     L"b", L"");
 
     do_test(L"abcde", L"abc",           L"abcde", L"abc");
     do_test(L"(abc)+ 1", L"(abc)+",     L"abc", L"abc");

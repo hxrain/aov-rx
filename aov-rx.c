@@ -95,7 +95,7 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
     int cnt = 0;
 
     for (;;) {
-        int oc = c;
+        int a = 0;
         wchar_t *r = frx;
         wchar_t *t = &tx[c];
         int min = 1, max = 1;
@@ -119,7 +119,7 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
             int ii = 0;
 
             r++;
-            c += match_here(r, t, 0, &ii);
+            a = match_here(r, t, 0, &ii);
             r += ii;
         }
         else
@@ -134,17 +134,17 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
                 r = in_set(r + 1, *t, &f);
 
             if (f)
-                c++;
+                a++;
         }
         else
         if (*r == L'.')                     /* any char */
-            c++;
+            a++;
         else
         if (*r == L'\\' && *++r == *t)      /* escaped char */
-            c++;
+            a++;
         else
         if (*r == *t)                       /* exact char */
-            c++;
+            a++;
 
         if (*r) {                           /* parse quantifier */
             r++;
@@ -165,16 +165,17 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
             }
         }
 
-        if (c > oc) {
+        if (a) {
+            c += a;
             cnt++;
 
             /* upper limit not reached? try searching the same again one more time */
             if (!max || cnt < max) {
                 if (min == 0) {
-                    int ii = 0, nc;
+                    int ii = 0;
 
-                    if ((nc = match_here(r, tx, c, &ii)) > c) {
-                        c = nc;
+                    if ((a = match_here(r, &tx[c], 0, &ii))) {
+                        c += a;
                         frx = r + ii;
                     }
                 }
