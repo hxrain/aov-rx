@@ -76,6 +76,7 @@ int main(int argc, char *argv[])
         verbose = 1;
 
     do_test(L"basic 2", L"a+",  L"a", L"a");
+    do_test(L"basic 3", L"a.*",  L"a", L"a");
     do_test(L"basic 0", L".a",  L"b", L"");
     do_test(L"basic 1", L".a$", L"b", L"");
 

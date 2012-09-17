@@ -100,6 +100,11 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
         wchar_t *t = &tx[c];
         int min = 1, max = 1;
 
+        if (*r == L'|') {                   /* end of alternate set */
+            frx = skip_to(r, L')');
+            break;
+        }
+
         if (*r == L'\0' || *r == L')')      /* end of match */
             break;
 
@@ -107,11 +112,6 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
             if (*r != L'$')
                 c = 0;
 
-            break;
-        }
-
-        if (*r == L'|') {                   /* end of alternate set */
-            frx = skip_to(r, L')');
             break;
         }
 
