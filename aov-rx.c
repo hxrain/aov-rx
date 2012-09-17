@@ -103,7 +103,7 @@ static int match_here(wchar_t *rx, wchar_t *tx, int c, int *i)
         if (*r == L'\0' || *r == L')')      /* end of match */
             break;
 
-        if (*t == L'\0') {               /* out of text */
+        if (*t == L'\0') {                  /* out of text */
             if (*r != L'$')
                 c = 0;
 
