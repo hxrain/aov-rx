@@ -40,7 +40,8 @@ Features
  - Alternate sets (str1|str2|str3)
  - Bracket-wrapped character sets, positive and negative ([0-9], [^0-9])
 
-And in BNF notation:
+BNF notation
+------------
 
   regexp:
     [ '^' ] sequence { '|' sequence }
@@ -55,6 +56,27 @@ And in BNF notation:
     char
   quantifier:
     '?' | '*' | '+' | '{' [ int ] [ ',' ] int '}'
+
+Design logic
+------------
+
+ MATCH rx, tx, m, cnt:
+
+    MATCH_WITH_QUANT
+        -> ir, it, min, max
+
+    min == 0 ?
+            MATCH       rx+ir,  tx, m+it,   0
+    it ?
+        cnt == max ?
+            MATCH       rx+ir,  tx, m+it,   0
+        else
+            MATCH       rx,     tx, m+it,   cnt+1
+    else
+        cnt > min ?
+            MATCH       rx+ir,  tx, m,      0
+        else
+            0
 
 Features that will (probably) be, but not soon
 ----------------------------------------------
