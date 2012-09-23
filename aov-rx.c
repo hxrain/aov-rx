@@ -233,34 +233,47 @@ struct rxctl {
 
 void match_05_here(struct rxctl *r, int cnt)
 {
-    if (*r->rx == L'|') {
-        /* ... move to ) */
-    }
-    else
-    if (*r->rx != L'\0' && *r->rx != L')') {
+    if (*r->rx != L'\0' && *r->rx != L'|' && *r->rx != L')') {
         int it = 0;
         int min, max;
         wchar_t *orx = r->rx;
 
+        if (*r->rx == L'(') {
+            struct rxctl sr;
+
+            sr.rx   = r->rx + 1;
+            sr.tx   = &r->tx[r->m];
+            sr.m    = 0;
+
+            match_05_here(&sr, 0);
+
+            r->rx   = sr.rx;
+            it      = sr.m;
+
+            if (*r->rx == L'|')
+                r->rx = skip_to(r->rx, L')');
+        }
+        else
         if (
             (*r->rx == L'.') ||
-            (*r->rx == L'$' && r->rx[r->m] == L'\0') ||
+            (*r->rx == L'$' && r->tx[r->m] == L'\0') ||
             (*r->rx == r->tx[r->m])
         )
             it++;
 
-        r->rx++;
-        switch (*r->rx) {
-        case L'?':  min = 0; max = 1; r->rx++; break;
-        case L'*':  min = 0; max = 0x7fffffff; r->rx++; break;
-        case L'+':  min = 1; max = 0x7fffffff; r->rx++; break;
-        default:    min = 1; max = 1; break;
+        if (*r) {
+            r->rx++;
+
+            switch (*r->rx) {
+            case L'?':  min = 0; max = 1; r->rx++; break;
+            case L'*':  min = 0; max = 0x7fffffff; r->rx++; break;
+            case L'+':  min = 1; max = 0x7fffffff; r->rx++; break;
+            default:    min = 1; max = 1; break;
+            }
         }
 
         r->m += it;
 
-/*        if (min == 0)
-            match_05_here(r, 0);*/
         if (it > 0) {
             if (cnt == max)
                 match_05_here(r, 0);
@@ -273,8 +286,8 @@ void match_05_here(struct rxctl *r, int cnt)
             if (cnt >= min)
                 match_05_here(r, 0);
             else {
-                r->m = 0;
-                /* ... move rx past | */
+                r->m  = 0;
+                r->rx = skip_past(r->rx, L'|');
                 match_05_here(r, 0);
             }
         }
