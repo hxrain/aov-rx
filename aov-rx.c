@@ -223,3 +223,60 @@ wchar_t *aov_match(wchar_t *rx, wchar_t *tx, int *size)
 
     return tx;
 }
+
+
+struct rxctl {
+    wchar_t *rx;
+    wchar_t *tx;
+    int     m;
+};
+
+void match_05_here(struct rxctl *r, int cnt)
+{
+    if (*r->rx == L'|') {
+        /* ... move to ) */
+    }
+    else
+    if (*r->rx != L'\0' && *r->rx != L')') {
+        int it = 0;
+        int min, max;
+        wchar_t *orx = r->rx;
+
+        if (
+            (*r->rx == L'.') ||
+            (*r->rx == L'$' && r->rx[r->m] == L'\0') ||
+            (*r->rx == r->tx[r->m])
+        )
+            it++;
+
+        r->rx++;
+        switch (*r->rx) {
+        case L'?':  min = 0; max = 1; r->rx++; break;
+        case L'*':  min = 0; max = 0x7fffffff; r->rx++; break;
+        case L'+':  min = 1; max = 0x7fffffff; r->rx++; break;
+        default:    min = 1; max = 1; break;
+        }
+
+        r->m += it;
+
+/*        if (min == 0)
+            match_05_here(r, 0);*/
+        if (it > 0) {
+            if (cnt == max)
+                match_05_here(r, 0);
+            else {
+                r->rx = orx;
+                match_05_here(r, cnt + 1);
+            }
+        }
+        else {
+            if (cnt >= min)
+                match_05_here(r, 0);
+            else {
+                r->m = 0;
+                /* ... move rx past | */
+                match_05_here(r, 0);
+            }
+        }
+    }
+}
