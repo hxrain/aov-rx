@@ -261,7 +261,7 @@ void match_05_here(struct rxctl *r, int cnt)
         )
             it++;
 
-        if (*r) {
+        if (*r->rx) {
             r->rx++;
 
             switch (*r->rx) {
