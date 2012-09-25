@@ -1,5 +1,7 @@
 CFLAGS=-Wall -g
 
+all: stress
+
 aov-rx.o: aov-rx.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
