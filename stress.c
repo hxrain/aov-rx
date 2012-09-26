@@ -67,6 +67,7 @@ int test_summary(void)
 
 wchar_t *match(wchar_t *rx, wchar_t *tx, int *size);
 
+wchar_t *aov_05_match(wchar_t *rx, wchar_t *tx, int *size);
 
 int main(int argc, char *argv[])
 {
@@ -74,6 +75,12 @@ int main(int argc, char *argv[])
 
     if (argc > 1 && strcmp(argv[1], "-v") == 0)
         verbose = 1;
+
+    int s;
+    aov_05_match(L"a", L"a", &s);
+    aov_05_match(L"a*", L"a", &s);
+    aov_05_match(L"a+", L"a", &s);
+    aov_05_match(L"a.*", L"a", &s);
 
     do_test(L"basic 0", L"a",       L"a", L"a");
     do_test(L"basic 1", L"a*",      L"a", L"a");

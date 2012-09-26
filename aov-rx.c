@@ -233,7 +233,7 @@ struct rxctl {
 
 void match_05_here(struct rxctl *r, int cnt)
 {
-    if (*r->rx != L'\0' && *r->rx != L'|' && *r->rx != L')') {
+    if (*r->rx != L'\0' && *r->rx != L'|' && *r->rx != L')' && r->tx[r->m]) {
         int it = 0;
         int min, max;
         wchar_t *orx = r->rx;
@@ -275,11 +275,13 @@ void match_05_here(struct rxctl *r, int cnt)
         r->m += it;
 
         if (it > 0) {
+            cnt++;
+
             if (cnt == max)
                 match_05_here(r, 0);
             else {
                 r->rx = orx;
-                match_05_here(r, cnt + 1);
+                match_05_here(r, cnt);
             }
         }
         else {
@@ -292,4 +294,33 @@ void match_05_here(struct rxctl *r, int cnt)
             }
         }
     }
+}
+
+
+wchar_t *aov_05_match(wchar_t *rx, wchar_t *tx, int *size)
+{
+    struct rxctl r;
+
+    r.rx    = rx;
+    r.tx    = tx;
+    r.m     = 0;
+
+    if (*rx == L'^') {
+        r.rx++;
+        match_05_here(&r, 0);
+    }
+    else {
+        while (*tx) {
+            match_05_here(&r, 0);
+
+            if (r.m)
+                break;
+
+            r.tx++;
+        }
+    }
+
+    *size = r.m;
+
+    return r.tx;
 }
