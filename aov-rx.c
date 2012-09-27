@@ -24,7 +24,7 @@
 
 #include "aov-rx.h"
 
-#define VERSION "0.5-dev"
+#define VERSION "0.5.0-dev"
 
 
 static wchar_t *in_set(wchar_t *rx, wchar_t c, int *found)
@@ -224,6 +224,8 @@ wchar_t *aov_match(wchar_t *rx, wchar_t *tx, int *size)
     return tx;
 }
 
+
+/** 0.5.1 **/
 
 struct rxctl {
     wchar_t *rx;
