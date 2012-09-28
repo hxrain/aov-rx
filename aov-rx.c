@@ -235,11 +235,14 @@ struct rxctl {
 
 void match_05_here(struct rxctl *r, int cnt)
 {
-    if (*r->rx != L'\0' && *r->rx != L'|' && *r->rx != L')' && r->tx[r->m]) {
+    if (*r->rx != L'\0' && *r->rx != L'|' && *r->rx != L')' /*&& r->tx[r->m]*/) {
         int it = 0;
         int min, max;
         wchar_t *orx = r->rx;
 
+        if (r->tx[r->m] == L'\0') {
+        }
+        else
         if (*r->rx == L'(') {
             struct rxctl sr;
 
@@ -335,7 +338,7 @@ wchar_t *aov_05_match(wchar_t *rx, wchar_t *tx, int *size)
         match_05_here(&r, 0);
     }
     else {
-        while (*tx) {
+        while (*r.tx) {
             match_05_here(&r, 0);
 
             if (r.m)
