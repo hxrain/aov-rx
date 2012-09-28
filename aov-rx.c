@@ -256,6 +256,20 @@ void match_05_here(struct rxctl *r, int cnt)
                 r->rx = skip_to(r->rx, L')');
         }
         else
+        if (*r->rx == L'[') {                   /* set */
+            int f = 0;
+
+            if (r->rx[1] == L'^') {
+                r->rx = in_set(r->rx + 2, r->tx[r->m], &f);
+                f = !f;
+            }
+            else
+                r->rx = in_set(r->rx + 1, r->rx[r->m], &f);
+
+            if (f)
+                it++;
+        }
+        else
         if (
             (*r->rx == L'.') ||
             (*r->rx == L'$' && r->tx[r->m] == L'\0') ||
