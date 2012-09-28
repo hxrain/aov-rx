@@ -259,6 +259,7 @@ void match_05_here(struct rxctl *r, int cnt)
         if (
             (*r->rx == L'.') ||
             (*r->rx == L'$' && r->tx[r->m] == L'\0') ||
+            (*r->rx == L'\\' && *++r->rx == r->tx[r->m]) ||
             (*r->rx == r->tx[r->m])
         )
             it++;
@@ -270,6 +271,14 @@ void match_05_here(struct rxctl *r, int cnt)
             case L'?':  min = 0; max = 1; r->rx++; break;
             case L'*':  min = 0; max = 0x7fffffff; r->rx++; break;
             case L'+':  min = 1; max = 0x7fffffff; r->rx++; break;
+            case L'{':  r->rx = parse_int(r->rx + 1, &min);
+                if (*r->rx == L',')
+                    r->rx = parse_int(r->rx + 1, &max);
+                else
+                    max = min;
+
+                r->rx++;
+                break;
             default:    min = 1; max = 1; break;
             }
         }
