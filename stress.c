@@ -225,6 +225,7 @@ int main(int argc, char *argv[])
     do_test(L"More sets 3", L"[a-z][a-z]* *: *[1-9][0-9]*", L"key : 123456 # comment", L"key : 123456");
     do_test(L"More sets 4", L"[a-z][a-z]* *: *[1-9][0-9]*", L"k: 6000", L"k: 6000");
     do_test(L"More sets 5", L"[a-z][a-z]* *: *[1-9][0-9]*", L"key: 1", L"key: 1");
+    do_test(L"More sets 6", L"[1-9][0-9]*", L"6000", L"6000");
 
     do_test(L"Brace matches 1 (like ?)", L"https{0,1}://",  L"http://triptico.com", L"http://");
     do_test(L"Brace matches 2 (like ?)", L"https{0,1}://",  L"https://triptico.com", L"https://");

@@ -118,11 +118,6 @@ static void match_here(struct rxctl *r, int cnt)
                 r->rx = skip_to(r->rx, L')');
         }
         else
-        if (r->tx[r->m] == L'\0') {
-            if (*r->rx == L'$')
-                it++;                               /* matched $ */
-        }
-        else
         if (*r->rx == L'[') {
             int f = 0;
 
@@ -135,6 +130,11 @@ static void match_here(struct rxctl *r, int cnt)
 
             if (f)
                 it++;                               /* matched set */
+        }
+        else
+        if (r->tx[r->m] == L'\0') {
+            if (*r->rx == L'$')
+                it++;                               /* matched $ */
         }
         else
         if (*r->rx == L'.')
