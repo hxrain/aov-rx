@@ -83,6 +83,9 @@ int main(int argc, char *argv[])
     aov_05_match(L"a.*", L"a", &s);
     aov_05_match(L".a", L"b", &s);
 
+    aov_05_match(L"abc", L"abcde", &s);
+    aov_05_match(L"(abc)+", L"abc", &s);
+
     do_test(L"basic 0", L"a",       L"a", L"a");
     do_test(L"basic 1", L"a*",      L"a", L"a");
     do_test(L"basic 2", L"a+",      L"a", L"a");

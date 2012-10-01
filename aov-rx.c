@@ -240,9 +240,6 @@ void match_05_here(struct rxctl *r, int cnt)
         int min, max;
         wchar_t *orx = r->rx;
 
-        if (r->tx[r->m] == L'\0') {
-        }
-        else
         if (*r->rx == L'(') {
             struct rxctl sr;
 
@@ -257,6 +254,9 @@ void match_05_here(struct rxctl *r, int cnt)
 
             if (*r->rx == L'|')
                 r->rx = skip_to(r->rx, L')');
+        }
+        else
+        if (r->tx[r->m] == L'\0') {
         }
         else
         if (*r->rx == L'[') {                   /* set */
