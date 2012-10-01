@@ -141,7 +141,7 @@ static void match_here(struct rxctl *r, int cnt)
             it++;                                   /* exact match */
 
         if (*r->rx) {
-            r->rx++;
+            r->rx++;                                /* parse quantifier */
 
             switch (*r->rx) {
             case L'?':  min = 0; max = 1; r->rx++; break;
@@ -161,7 +161,7 @@ static void match_here(struct rxctl *r, int cnt)
         if (min == 0) {
             int m;
 
-            match_here_r(r->rx, &r->tx[r->m], &m);
+            match_here_r(r->rx, &r->tx[r->m], &m);  /* min == 0 restart */
 
             if (m) {
                 r->m += m;
@@ -175,19 +175,19 @@ static void match_here(struct rxctl *r, int cnt)
             cnt++;
 
             if (cnt == max)
-                match_here(r, 0);
+                match_here(r, 0);                   /* restart */
             else {
                 r->rx = orx;
-                match_here(r, cnt);
+                match_here(r, cnt);                 /* try repetition */
             }
         }
         else {
             if (cnt >= min)
-                match_here(r, 0);
+                match_here(r, 0);                   /* enough prev. cnt */
             else {
                 r->m  = 0;
                 r->rx = skip_past(r->rx, L'|');
-                match_here(r, 0);
+                match_here(r, 0);                   /* nonmatch retry */
             }
         }
     }
