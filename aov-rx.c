@@ -24,7 +24,7 @@
 
 #include "aov-rx.h"
 
-#define VERSION "0.5.1-dev"
+#define VERSION "0.5.1"
 
 
 static wchar_t *in_set(wchar_t *rx, wchar_t c, int *found)
@@ -164,7 +164,7 @@ static void match_here(struct rxctl *r, int cnt)
             match_here_r(r->rx, &r->tx[r->m], &m);  /* min == 0 restart */
 
             if (m) {
-                r->m += m;
+                r->m += m;                          /* match from here */
                 return;
             }
         }
