@@ -339,6 +339,8 @@ wchar_t *aov_05_match(wchar_t *rx, wchar_t *tx, int *size)
     }
     else {
         while (*r.tx) {
+            r.rx = rx;
+
             match_05_here(&r, 0);
 
             if (r.m)
