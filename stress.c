@@ -88,6 +88,13 @@ int main(int argc, char *argv[])
     aov_05_match(L"(abc)+", L"abcabc", &s);
     aov_05_match(L"(abc)+", L"filler1 abcabc filler2", &s);
 
+    aov_05_match(L"yes|no", L"yes", &s);
+    aov_05_match(L"yes|no", L"no", &s);
+    aov_05_match(L"yes|you", L"you", &s);
+    aov_05_match(L"(yes|no)", L"yes", &s);
+    aov_05_match(L"(yes|no)", L"no", &s);
+    aov_05_match(L"(yes|you)", L"you", &s);
+
     do_test(L"basic 0", L"a",       L"a", L"a");
     do_test(L"basic 1", L"a*",      L"a", L"a");
     do_test(L"basic 2", L"a+",      L"a", L"a");
@@ -101,6 +108,9 @@ int main(int argc, char *argv[])
     do_test(L"yes|no 1", L"yes|no",     L"yes", L"yes");
     do_test(L"yes|no 2", L"yes|no",     L"no", L"no");
     do_test(L"yes|you", L"yes|you",     L"you", L"you");
+    do_test(L"yes|no 1.2", L"(yes|no)", L"yes", L"yes");
+    do_test(L"yes|no 2.2", L"(yes|no)", L"no", L"no");
+    do_test(L"yes|you 2", L"(yes|you)", L"you", L"you");
     do_test(L"[ba0-9]+", L"[ba0-9]+",   L"12a34c", L"12a34");
     do_test(L"[0-9]+", L"[0-9]+",       L"12a34", L"12");
     do_test(L"test.*", L"test.*",       L"test", L"test");
