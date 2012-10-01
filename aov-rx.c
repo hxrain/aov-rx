@@ -161,6 +161,21 @@ static void match_here(struct rxctl *r, int cnt)
             }
         }
 
+        if (min == 0) {
+            struct rxctl sr;
+
+            sr.rx   = r->rx;
+            sr.tx   = &r->tx[r->m];
+            sr.m    = 0;
+
+            match_here(&sr, 0);
+
+            if (sr.m) {
+                r->m += sr.m;
+                return;
+            }
+        }
+
         r->m += it;
 
         if (it > 0) {
