@@ -76,6 +76,7 @@ int main(int argc, char *argv[])
     if (argc > 1 && strcmp(argv[1], "-v") == 0)
         verbose = 1;
 
+#if 0
     int s;
     aov_05_match(L"a", L"a", &s);
     aov_05_match(L"a*", L"a", &s);
@@ -94,6 +95,7 @@ int main(int argc, char *argv[])
     aov_05_match(L"(yes|no)", L"yes", &s);
     aov_05_match(L"(yes|no)", L"no", &s);
     aov_05_match(L"(yes|you)", L"you", &s);
+#endif
 
     do_test(L"basic 0", L"a",       L"a", L"a");
     do_test(L"basic 1", L"a*",      L"a", L"a");
