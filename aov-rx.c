@@ -215,14 +215,9 @@ wchar_t *aov_match(wchar_t *rx, wchar_t *tx, int *size)
     if (*rx == L'^')
         match_here_r(rx + 1, tx, size);
     else
-    while (*tx) {
+    do {
         match_here_r(rx, tx, size);
-
-        if (*size)
-            break;
-        else
-            tx++;
-    }
+    } while (!*size && *tx++);
 
     return tx;
 }
