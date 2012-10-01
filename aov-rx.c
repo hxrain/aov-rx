@@ -129,7 +129,7 @@ static void match_here(struct rxctl *r, int cnt)
                 f = !f;
             }
             else
-                r->rx = in_set(r->rx + 1, r->rx[r->m], &f);
+                r->rx = in_set(r->rx + 1, r->tx[r->m], &f);
 
             if (f)
                 it++;
