@@ -95,6 +95,8 @@ struct rxctl {
     int     m;
 };
 
+static wchar_t *match_here_r(wchar_t *rx, wchar_t *tx, int *size);
+
 static void match_here(struct rxctl *r, int cnt)
 {
     if (*r->rx != L'\0' && *r->rx != L'|' && *r->rx != L')') {
@@ -103,16 +105,8 @@ static void match_here(struct rxctl *r, int cnt)
         wchar_t *orx = r->rx;
 
         if (*r->rx == L'(') {
-            struct rxctl sr;
-
-            sr.rx   = r->rx + 1;
-            sr.tx   = &r->tx[r->m];
-            sr.m    = 0;
-
-            match_here(&sr, 0);
-
-            r->rx   = sr.rx;
-            it      = sr.m;                         /* subregex */
+            r->rx = match_here_r(
+                r->rx + 1, &r->tx[r->m], &it);      /* subregex */
 
             if (*r->rx == L'|')
                 r->rx = skip_to(r->rx, L')');
@@ -168,16 +162,12 @@ static void match_here(struct rxctl *r, int cnt)
         }
 
         if (min == 0) {
-            struct rxctl sr;
+            int m;
 
-            sr.rx   = r->rx;
-            sr.tx   = &r->tx[r->m];
-            sr.m    = 0;
+            match_here_r(r->rx, &r->tx[r->m], &m);
 
-            match_here(&sr, 0);
-
-            if (sr.m) {
-                r->m += sr.m;
+            if (m) {
+                r->m += m;
                 return;
             }
         }
@@ -204,6 +194,22 @@ static void match_here(struct rxctl *r, int cnt)
             }
         }
     }
+}
+
+
+static wchar_t *match_here_r(wchar_t *rx, wchar_t *tx, int *size)
+{
+    struct rxctl r;
+
+    r.rx    = rx;
+    r.tx    = tx;
+    r.m     = 0;
+
+    *size = 0;
+    match_here(&r, 0);
+    *size = r.m;
+
+    return r.rx;
 }
 
 
