@@ -134,9 +134,6 @@ static void match_here(struct rxctl *r, int cnt)
         if (*r->rx == L'.')
             it++;                                   /* matched . */
         else
-        if (*r->rx == L'$' && r->tx[r->m] == L'\0')
-            it++;                                   /* matched $ (2) */
-        else
         if (*r->rx == L'\\' && *++r->rx == r->tx[r->m])
             it++;                                   /* matched escaped */
         else
