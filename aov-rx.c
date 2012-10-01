@@ -97,7 +97,7 @@ struct rxctl {
 
 static void match_here(struct rxctl *r, int cnt)
 {
-    if (*r->rx != L'\0' && *r->rx != L'|' && *r->rx != L')' /*&& r->tx[r->m]*/) {
+    if (*r->rx != L'\0' && *r->rx != L'|' && *r->rx != L')') {
         int it = 0;
         int min = 1, max = 1;
         wchar_t *orx = r->rx;
@@ -112,7 +112,7 @@ static void match_here(struct rxctl *r, int cnt)
             match_here(&sr, 0);
 
             r->rx   = sr.rx;
-            it      = sr.m;
+            it      = sr.m;                         /* subregex */
 
             if (*r->rx == L'|')
                 r->rx = skip_to(r->rx, L')');
@@ -120,10 +120,10 @@ static void match_here(struct rxctl *r, int cnt)
         else
         if (r->tx[r->m] == L'\0') {
             if (*r->rx == L'$')
-                it++;
+                it++;                               /* matched $ */
         }
         else
-        if (*r->rx == L'[') {                   /* set */
+        if (*r->rx == L'[') {
             int f = 0;
 
             if (r->rx[1] == L'^') {
@@ -134,16 +134,20 @@ static void match_here(struct rxctl *r, int cnt)
                 r->rx = in_set(r->rx + 1, r->tx[r->m], &f);
 
             if (f)
-                it++;
+                it++;                               /* matched set */
         }
         else
-        if (
-            (*r->rx == L'.') ||
-            (*r->rx == L'$' && r->tx[r->m] == L'\0') ||
-            (*r->rx == L'\\' && *++r->rx == r->tx[r->m]) ||
-            (*r->rx == r->tx[r->m])
-        )
-            it++;
+        if (*r->rx == L'.')
+            it++;                                   /* matched . */
+        else
+        if (*r->rx == L'$' && r->tx[r->m] == L'\0')
+            it++;                                   /* matched $ (2) */
+        else
+        if (*r->rx == L'\\' && *++r->rx == r->tx[r->m])
+            it++;                                   /* matched escaped */
+        else
+        if (*r->rx == r->tx[r->m])
+            it++;                                   /* exact match */
 
         if (*r->rx) {
             r->rx++;
