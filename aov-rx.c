@@ -212,30 +212,17 @@ static wchar_t *match_here_r(wchar_t *rx, wchar_t *tx, int *size)
 
 wchar_t *aov_match(wchar_t *rx, wchar_t *tx, int *size)
 {
-    struct rxctl r;
+    if (*rx == L'^')
+        match_here_r(rx + 1, tx, size);
+    else
+    while (*tx) {
+        match_here_r(rx, tx, size);
 
-    r.rx    = rx;
-    r.tx    = tx;
-    r.m     = 0;
-
-    if (*rx == L'^') {
-        r.rx++;
-        match_here(&r, 0);
-    }
-    else {
-        while (*r.tx) {
-            r.rx = rx;
-
-            match_here(&r, 0);
-
-            if (r.m)
-                break;
-
-            r.tx++;
-        }
+        if (*size)
+            break;
+        else
+            tx++;
     }
 
-    *size = r.m;
-
-    return r.tx;
+    return tx;
 }
