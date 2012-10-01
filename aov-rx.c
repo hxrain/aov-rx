@@ -99,7 +99,7 @@ static void match_here(struct rxctl *r, int cnt)
 {
     if (*r->rx != L'\0' && *r->rx != L'|' && *r->rx != L')' /*&& r->tx[r->m]*/) {
         int it = 0;
-        int min, max;
+        int min = 1, max = 1;
         wchar_t *orx = r->rx;
 
         if (*r->rx == L'(') {
@@ -158,7 +158,6 @@ static void match_here(struct rxctl *r, int cnt)
 
                 r->rx++;
                 break;
-            default:    min = 1; max = 1; break;
             }
         }
 

@@ -97,6 +97,7 @@ int main(int argc, char *argv[])
     aov_05_match(L"(yes|you)", L"you", &s);
 #endif
 
+    do_test(L"basic 0", L".*a",     L"a", L"a");
     do_test(L"basic 0", L"a",       L"a", L"a");
     do_test(L"basic 1", L"a*",      L"a", L"a");
     do_test(L"basic 2", L"a+",      L"a", L"a");
