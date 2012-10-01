@@ -25,8 +25,18 @@ void _do_test(wchar_t *desc, wchar_t *rx, wchar_t *tx, wchar_t *exp_s, int src_l
     tests++;
 
     stx = aov_match(rx, tx, &size);
-    stx2 = wcsdup(stx);
-    stx2[size] = 0;
+
+    if (stx && *stx) {
+        stx2 = wcsdup(stx);
+
+        if (wcslen(stx2) < size)
+            wprintf(L"stress.c:%d: warning: wcslen(stx2) %d < size %d (stx2: %ls)\n",
+                src_line, wcslen(stx2), size, stx2);
+        else
+            stx2[size] = 0;
+    }
+    else
+        stx2 = L"";
 
     if (wcscmp(stx2, exp_s) == 0) {
         /* match: test now the string */
@@ -36,7 +46,7 @@ void _do_test(wchar_t *desc, wchar_t *rx, wchar_t *tx, wchar_t *exp_s, int src_l
             wprintf(L"stress.c:%d: OK (test %d, \"%ls\")\n", src_line, tests, desc);
     }
     else {
-        wprintf(L"stress.c:%d: (test %d, \"%ls\") *** Failed ***", src_line, tests, desc);
+        wprintf(L"stress.c:%d: error: (test %d, \"%ls\") ", src_line, tests, desc);
         wprintf(L", size: %d, stx: \"%ls\", expected \"%ls\"\n", size, stx2, exp_s);
     }
 }

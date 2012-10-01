@@ -119,6 +119,8 @@ static void match_here(struct rxctl *r, int cnt)
         }
         else
         if (r->tx[r->m] == L'\0') {
+            if (*r->rx == L'$')
+                it++;
         }
         else
         if (*r->rx == L'[') {                   /* set */
