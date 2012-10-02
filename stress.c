@@ -75,98 +75,91 @@ int test_summary(void)
 #define do_test(d, r, t, s) _do_test(d, r, t, s, __LINE__)
 
 
-wchar_t *match(wchar_t *rx, wchar_t *tx, int *size);
+struct rx_test {
+    wchar_t *rx;
+    wchar_t *tx;
+    wchar_t *r;
+} rx_tests[] = {
+    { L".*a",       L"a",                                 L"a" },
+    { L"a",         L"a",                                 L"a" },
+    { L"a*",        L"a",                                 L"a" },
+    { L"a+",        L"a",                                 L"a" },
+    { L"a.*",       L"a",                                 L"a" },
+    { L".a",        L"b",                                 L"" },
+    { L".a$",       L"b",                                 L"" },
 
-wchar_t *aov_05_match(wchar_t *rx, wchar_t *tx, int *size);
+    { L"abc",       L"abcde",                             L"abc" },
+    { L"(abc)+",    L"abc",                               L"abc" },
+    { L"(abc)+",    L"abcabc",                            L"abcabc" },
+    { L"yes|no",    L"yes",                               L"yes" },
+    { L"yes|no",    L"no",                                L"no" },
+    { L"yes|you",   L"you",                               L"you" },
+    { L"(yes|no)",  L"yes",                               L"yes" },
+    { L"(yes|no)",  L"no",                                L"no" },
+    { L"(yes|you)", L"you",                               L"you" },
+    { L"[ba0-9]+",  L"12a34c",                            L"12a34" },
+    { L"[0-9]+",    L"12a34",                             L"12" },
+    { L"test.*",    L"test",                              L"test" },
+    { L"test",      L"test",                              L"test" },
+    { L".*",        L"",                                  L"" },
+
+    /* ^ */
+    { L"^text",     L"this string has text",              L"" },
+    { L"^this",     L"this string has text",              L"this" },
+
+    /* basic */
+    { L"string",    L"this string has text",              L"string" },
+    { L"h.la",      L"hola",                              L"hola" },
+
+    /* * */
+    { L"g.*text",   L"this string has text",              L"g has text" },
+    { L"stri*ng",   L"this string has text",              L"string" },
+
+    /* .* non-greedy */
+    { L"str.*ng",    L"this string has string text",      L"string" },
+    { L"str.*ng.*x", L"this string has string text",      L"string has string tex" },
+    { L"one *world", L"one world",                        L"one world" },
+    { L"a*bc",       L"aaabc",                            L"aaabc" },
+
+    /* ? */
+    { L"https?://",  L"http://triptico.com",              L"http://" },
+    { L"https?://",  L"https://triptico.com",             L"https://" },
+    { L"hos?la",     L"hocla",                            L"" },
+    { L"hos?la",     L"hola",                             L"hola" },
+    { L"hos?la",     L"hosla",                            L"hosla" },
+
+    /* $ */
+    { L"text$",      L"this string has text",             L"text" },
+    { L"text$",      L"this string has text alone",       L"" },
+
+    /* parens */
+    { L"(http|ftp)://",     L"http://triptico.com",       L"http://" },
+    { L"(http|ftp)://",     L"ftp://triptico.com",        L"ftp://" },
+    { L"(http|ftp)s?://",   L"http://triptico.com",       L"http://" },
+    { L"(http|ftp)s?://",   L"ftp://triptico.com",        L"ftp://" },
+    { L"(http|ftp)s?://",   L"ftps://triptico.com",       L"ftps://" },
+    { L"(gopher|http|ftp)s?://",  L"http://triptico.com", L"http://" },
+    { L".(es|com)$",        L"http://triptico.com",       L".com" },
+    { L".(es|com)$",        L"http://triptico.es",        L".es" },
+    { L".(es|com)$",        L"http://triptico.org",       L"" },
+
+    { NULL,         NULL,                                 NULL }
+};
+
 
 int main(int argc, char *argv[])
 {
-//    int r, o1, o2;
+    int n;
 
     if (argc > 1 && strcmp(argv[1], "-v") == 0)
         verbose = 1;
 
-#if 0
-    int s;
-    aov_05_match(L"a", L"a", &s);
-    aov_05_match(L"a*", L"a", &s);
-    aov_05_match(L"a+", L"a", &s);
-    aov_05_match(L"a.*", L"a", &s);
-    aov_05_match(L".a", L"b", &s);
-    aov_05_match(L".a$", L"b", &s);
+    /* loop all tests */
+    for (n = 0; rx_tests[n].rx != NULL; n++) {
+        struct rx_test *r = &rx_tests[n];
 
-    aov_05_match(L"abc", L"abcde", &s);
-    aov_05_match(L"(abc)+", L"abcabc", &s);
-    aov_05_match(L"(abc)+", L"filler1 abcabc filler2", &s);
-
-    aov_05_match(L"yes|no", L"yes", &s);
-    aov_05_match(L"yes|no", L"no", &s);
-    aov_05_match(L"yes|you", L"you", &s);
-    aov_05_match(L"(yes|no)", L"yes", &s);
-    aov_05_match(L"(yes|no)", L"no", &s);
-    aov_05_match(L"(yes|you)", L"you", &s);
-#endif
-
-    do_test(L"basic 0", L".*a",     L"a", L"a");
-    do_test(L"basic 0", L"a",       L"a", L"a");
-    do_test(L"basic 1", L"a*",      L"a", L"a");
-    do_test(L"basic 2", L"a+",      L"a", L"a");
-    do_test(L"basic 3", L"a.*",     L"a", L"a");
-    do_test(L"basic 4", L".a",      L"b", L"");
-    do_test(L"basic 5", L".a$",     L"b", L"");
-
-    do_test(L"abcde", L"abc",           L"abcde", L"abc");
-    do_test(L"(abc)+ 1", L"(abc)+",     L"abc", L"abc");
-    do_test(L"(abc)+ 2", L"(abc)+",     L"abcabc",L"abcabc");
-    do_test(L"yes|no 1", L"yes|no",     L"yes", L"yes");
-    do_test(L"yes|no 2", L"yes|no",     L"no", L"no");
-    do_test(L"yes|you", L"yes|you",     L"you", L"you");
-    do_test(L"yes|no 1.2", L"(yes|no)", L"yes", L"yes");
-    do_test(L"yes|no 2.2", L"(yes|no)", L"no", L"no");
-    do_test(L"yes|you 2", L"(yes|you)", L"you", L"you");
-    do_test(L"[ba0-9]+", L"[ba0-9]+",   L"12a34c", L"12a34");
-    do_test(L"[0-9]+", L"[0-9]+",       L"12a34", L"12");
-    do_test(L"test.*", L"test.*",       L"test", L"test");
-    do_test(L"test", L"test",           L"test", L"test");
-    do_test(L".*", L".*",               L"", L"");
-
-    /* ^ */
-    do_test(L"Non-matching ^", L"^text", L"this string has text", L"");
-    do_test(L"Matching ^", L"^this", L"this string has text", L"this");
-
-    /* basic */
-    do_test(L"Basic string", L"string", L"this string has text", L"string");
-    do_test(L"Dots", L"h.la", L"hola", L"hola");
-
-    /* * */
-    do_test(L".* 1", L"g.*text", L"this string has text", L"g has text");
-    do_test(L"i* 1", L"stri*ng", L"this string has text", L"string");
-    do_test(L".* is non greedy", L"str.*ng", L"this string has string text", L"string");
-    do_test(L"More than 1 .*", L"str.*ng.*x", L"this string has string text", L"string has string tex");
-    do_test(L"* match to the end", L"one *world", L"one world", L"one world");
-    do_test(L"More *", L"a*bc", L"aaabc", L"aaabc");
-
-    /* ? */
-    do_test(L"? 1", L"https?://", L"http://triptico.com", L"http://");
-    do_test(L"? 2", L"https?://", L"https://triptico.com", L"https://");
-    do_test(L"? 3", L"hos?la", L"hocla", L"");
-    do_test(L"? 4", L"hos?la", L"hola", L"hola");
-    do_test(L"? 5", L"hos?la", L"hosla", L"hosla");
-
-    /* $ */
-    do_test(L"Matching $ 1", L"text$", L"this string has text", L"text");
-    do_test(L"Matching $ 2", L"text$", L"this string has text alone", L"");
-
-    /* parens */
-    do_test(L"Paren 1", L"(http|ftp)://",           L"http://triptico.com", L"http://");
-    do_test(L"Paren 2", L"(http|ftp)://",           L"ftp://triptico.com", L"ftp://");
-    do_test(L"Paren 3", L"(http|ftp)s?://",         L"http://triptico.com", L"http://");
-    do_test(L"Paren 4", L"(http|ftp)s?://",         L"ftp://triptico.com", L"ftp://");
-    do_test(L"Paren 5", L"(http|ftp)s?://",         L"ftps://triptico.com", L"ftps://");
-    do_test(L"Paren 6", L"(gopher|http|ftp)s?://",  L"http://triptico.com", L"http://");
-    do_test(L"Paren 7", L".(es|com)$",              L"http://triptico.com", L".com");
-    do_test(L"Paren 8", L".(es|com)$",              L"http://triptico.es", L".es");
-    do_test(L"Paren 9", L".(es|com)$",              L"http://triptico.org", L"");
+        do_test(r->rx, r->rx, r->tx, r->r);
+    }
 
     /* + */
     do_test(L"+ 0 (really *)", L"one *world",   L"oneworld is enough", L"oneworld");
