@@ -2,7 +2,7 @@
 
     aov-rx - Angel Ortega's regular expression library
 
-    Copyright (C) 2011 Angel Ortega <angel@triptico.com>
+    Copyright (C) 2011/2012 Angel Ortega <angel@triptico.com>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License

@@ -54,7 +54,7 @@ Features that (probably) will never be
 Usage
 -----
 
-aov-rx consist only of the function:
+aov-rx consists only of one function:
 
  wchar_t *aov_match(wchar_t *rx, wchar_t *tx, int *size);
 
