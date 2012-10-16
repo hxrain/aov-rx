@@ -40,44 +40,6 @@ Features
  - Alternate sets (str1|str2|str3)
  - Bracket-wrapped character sets, positive and negative ([0-9], [^0-9])
 
-BNF notation
-------------
-
-  regexp:
-    [ '^' ] sequence { '|' sequence }
-  sequence:
-    { term }
-  term:
-    '$' | one [ quantifier ]
-  one:
-    '(' regexp ')'
-    '[' [ '^' ] char-ranges ']'
-    '.'
-    char
-  quantifier:
-    '?' | '*' | '+' | '{' [ int ] [ ',' ] int '}'
-
-Design logic
-------------
-
- MATCH rx, tx, m, cnt:
-
-    MATCH_WITH_QUANT
-        -> ir, it, min, max
-
-    min == 0 ?
-            MATCH       rx+ir,  tx, m+it,   0
-    it ?
-        cnt == max ?
-            MATCH       rx+ir,  tx, m+it,   0
-        else
-            MATCH       rx,     tx, m+it,   cnt+1
-    else
-        cnt > min ?
-            MATCH       rx+ir,  tx, m,      0
-        else
-            0
-
 Features that will (probably) be, but not soon
 ----------------------------------------------
 
@@ -88,6 +50,32 @@ Features that (probably) will never be
 --------------------------------------
 
  - Backreferences
+
+Usage
+-----
+
+aov-rx consist only of the function:
+
+ wchar_t *aov_match(wchar_t *rx, wchar_t *tx, int *size);
+
+And its usage is pretty straightforward:
+
+ #include <stdio.h>
+ #include <wchar.h>
+ #include "aov-rx.h"
+ 
+ int main(int argc, char *argv[])
+ {
+    int s;
+    wchar_t *res;
+ 
+    res = aov_match(L"/[0-9]+/", L"The number is 123, indeed", &s);
+ 
+    if (s) {
+        /* res points to 123, and s contains 3 */
+        ...
+    }
+    ...
 
 ---
 Angel Ortega
