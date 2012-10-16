@@ -38,7 +38,10 @@ Features
    - * (match 0 or many occurrences, same as {0,})
    - + (match 1 or many occurrences, same as {1,})
  - Alternate sets (str1|str2|str3)
- - Bracket-wrapped character sets, positive and negative ([0-9], [^0-9])
+ - Sub-regexes (between parentheses, also optionally
+   quantifiable)
+ - Bracket-wrapped character sets, positive and
+   negative ([0-9], [^0-9])
 
 Features that will (probably) be, but not soon
 ----------------------------------------------
