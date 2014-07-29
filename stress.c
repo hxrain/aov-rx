@@ -79,71 +79,72 @@ struct rx_test {
     wchar_t *rx;
     wchar_t *tx;
     wchar_t *r;
+    int src_line;
 } rx_tests[] = {
-    { L".*a",       L"a",                                 L"a" },
-    { L"a",         L"a",                                 L"a" },
-    { L"a*",        L"a",                                 L"a" },
-    { L"a+",        L"a",                                 L"a" },
-    { L"a.*",       L"a",                                 L"a" },
-    { L".a",        L"b",                                 L"" },
-    { L".a$",       L"b",                                 L"" },
+    { L".*a",       L"a",                                 L"a", __LINE__ },
+    { L"a",         L"a",                                 L"a", __LINE__ },
+    { L"a*",        L"a",                                 L"a", __LINE__ },
+    { L"a+",        L"a",                                 L"a", __LINE__ },
+    { L"a.*",       L"a",                                 L"a", __LINE__ },
+    { L".a",        L"b",                                 L"", __LINE__ },
+    { L".a$",       L"b",                                 L"", __LINE__ },
 
-    { L"abc",       L"abcde",                             L"abc" },
-    { L"(abc)+",    L"abc",                               L"abc" },
-    { L"(abc)+",    L"abcabc",                            L"abcabc" },
-    { L"yes|no",    L"yes",                               L"yes" },
-    { L"yes|no",    L"no",                                L"no" },
-    { L"yes|you",   L"you",                               L"you" },
-    { L"(yes|no)",  L"yes",                               L"yes" },
-    { L"(yes|no)",  L"no",                                L"no" },
-    { L"(yes|you)", L"you",                               L"you" },
-    { L"[ba0-9]+",  L"12a34c",                            L"12a34" },
-    { L"[0-9]+",    L"12a34",                             L"12" },
-    { L"test.*",    L"test",                              L"test" },
-    { L"test",      L"test",                              L"test" },
-    { L".*",        L"",                                  L"" },
+    { L"abc",       L"abcde",                             L"abc", __LINE__ },
+    { L"(abc)+",    L"abc",                               L"abc", __LINE__ },
+    { L"(abc)+",    L"abcabc",                            L"abcabc", __LINE__ },
+    { L"yes|no",    L"yes",                               L"yes", __LINE__ },
+    { L"yes|no",    L"no",                                L"no", __LINE__ },
+    { L"yes|you",   L"you",                               L"you", __LINE__ },
+    { L"(yes|no)",  L"yes",                               L"yes", __LINE__ },
+    { L"(yes|no)",  L"no",                                L"no", __LINE__ },
+    { L"(yes|you)", L"you",                               L"you", __LINE__ },
+    { L"[ba0-9]+",  L"12a34c",                            L"12a34", __LINE__ },
+    { L"[0-9]+",    L"12a34",                             L"12", __LINE__ },
+    { L"test.*",    L"test",                              L"test", __LINE__ },
+    { L"test",      L"test",                              L"test", __LINE__ },
+    { L".*",        L"",                                  L"", __LINE__ },
 
     /* ^ */
-    { L"^text",     L"this string has text",              L"" },
-    { L"^this",     L"this string has text",              L"this" },
+    { L"^text",     L"this string has text",              L"", __LINE__ },
+    { L"^this",     L"this string has text",              L"this", __LINE__ },
 
     /* basic */
-    { L"string",    L"this string has text",              L"string" },
-    { L"h.la",      L"hola",                              L"hola" },
+    { L"string",    L"this string has text",              L"string", __LINE__ },
+    { L"h.la",      L"hola",                              L"hola", __LINE__ },
 
     /* * */
-    { L"g.*text",   L"this string has text",              L"g has text" },
-    { L"stri*ng",   L"this string has text",              L"string" },
+    { L"g.*text",   L"this string has text",              L"g has text", __LINE__ },
+    { L"stri*ng",   L"this string has text",              L"string", __LINE__ },
 
     /* .* non-greedy */
-    { L"str.*ng",    L"this string has string text",      L"string" },
-    { L"str.*ng.*x", L"this string has string text",      L"string has string tex" },
-    { L"one *world", L"one world",                        L"one world" },
-    { L"a*bc",       L"aaabc",                            L"aaabc" },
+    { L"str.*ng",    L"this string has string text",      L"string", __LINE__ },
+    { L"str.*ng.*x", L"this string has string text",      L"string has string tex", __LINE__ },
+    { L"one *world", L"one world",                        L"one world", __LINE__ },
+    { L"a*bc",       L"aaabc",                            L"aaabc", __LINE__ },
 
     /* ? */
-    { L"https?://",  L"http://triptico.com",              L"http://" },
-    { L"https?://",  L"https://triptico.com",             L"https://" },
-    { L"hos?la",     L"hocla",                            L"" },
-    { L"hos?la",     L"hola",                             L"hola" },
-    { L"hos?la",     L"hosla",                            L"hosla" },
+    { L"https?://",  L"http://triptico.com",              L"http://", __LINE__ },
+    { L"https?://",  L"https://triptico.com",             L"https://", __LINE__ },
+    { L"hos?la",     L"hocla",                            L"", __LINE__ },
+    { L"hos?la",     L"hola",                             L"hola", __LINE__ },
+    { L"hos?la",     L"hosla",                            L"hosla", __LINE__ },
 
     /* $ */
-    { L"text$",      L"this string has text",             L"text" },
-    { L"text$",      L"this string has text alone",       L"" },
+    { L"text$",      L"this string has text",             L"text", __LINE__ },
+    { L"text$",      L"this string has text alone",       L"", __LINE__ },
 
     /* parens */
-    { L"(http|ftp)://",     L"http://triptico.com",       L"http://" },
-    { L"(http|ftp)://",     L"ftp://triptico.com",        L"ftp://" },
-    { L"(http|ftp)s?://",   L"http://triptico.com",       L"http://" },
-    { L"(http|ftp)s?://",   L"ftp://triptico.com",        L"ftp://" },
-    { L"(http|ftp)s?://",   L"ftps://triptico.com",       L"ftps://" },
-    { L"(gopher|http|ftp)s?://",  L"http://triptico.com", L"http://" },
-    { L".(es|com)$",        L"http://triptico.com",       L".com" },
-    { L".(es|com)$",        L"http://triptico.es",        L".es" },
-    { L".(es|com)$",        L"http://triptico.org",       L"" },
+    { L"(http|ftp)://",     L"http://triptico.com",       L"http://", __LINE__ },
+    { L"(http|ftp)://",     L"ftp://triptico.com",        L"ftp://", __LINE__ },
+    { L"(http|ftp)s?://",   L"http://triptico.com",       L"http://", __LINE__ },
+    { L"(http|ftp)s?://",   L"ftp://triptico.com",        L"ftp://", __LINE__ },
+    { L"(http|ftp)s?://",   L"ftps://triptico.com",       L"ftps://", __LINE__ },
+    { L"(gopher|http|ftp)s?://",  L"http://triptico.com", L"http://", __LINE__ },
+    { L".(es|com)$",        L"http://triptico.com",       L".com", __LINE__ },
+    { L".(es|com)$",        L"http://triptico.es",        L".es", __LINE__ },
+    { L".(es|com)$",        L"http://triptico.org",       L"", __LINE__ },
 
-    { NULL,         NULL,                                 NULL }
+    { NULL,         NULL,                                 NULL, 0 }
 };
 
 
@@ -158,7 +159,7 @@ int main(int argc, char *argv[])
     for (n = 0; rx_tests[n].rx != NULL; n++) {
         struct rx_test *r = &rx_tests[n];
 
-        do_test(r->rx, r->rx, r->tx, r->r);
+        _do_test(r->rx, r->rx, r->tx, r->r, r->src_line);
     }
 
     /* + */
