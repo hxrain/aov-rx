@@ -20,7 +20,7 @@ int i_failed_msgs = 0;
 void _do_test(wchar_t *desc, wchar_t *rx, wchar_t *tx, wchar_t *exp_s, int src_line)
 {
     wchar_t *stx, *stx2;
-    int size;
+    size_t size;
 
     tests++;
 

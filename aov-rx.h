@@ -10,4 +10,4 @@
 
 #include <wchar.h>
 
-wchar_t *aov_match(wchar_t *rx, wchar_t *tx, int *size);
+wchar_t *aov_match(wchar_t *rx, wchar_t *tx, size_t *size);

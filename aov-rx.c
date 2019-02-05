@@ -81,12 +81,12 @@ struct rxctl {
     int     m;
 };
 
-static wchar_t *match_here_r(wchar_t *rx, wchar_t *tx, int *size);
+static wchar_t *match_here_r(wchar_t *rx, wchar_t *tx, size_t *size);
 
 static void match_here(struct rxctl *r, int cnt)
 {
     if (*r->rx != L'\0' && *r->rx != L'|' && *r->rx != L')') {
-        int it = 0;
+        size_t it = 0;
         int min = 1, max = 1;
         wchar_t *orx = r->rx;
 
@@ -145,7 +145,7 @@ static void match_here(struct rxctl *r, int cnt)
         }
 
         if (min == 0) {
-            int m;
+            size_t m;
 
             match_here_r(r->rx, &r->tx[r->m], &m);  /* min == 0 restart */
 
@@ -180,7 +180,7 @@ static void match_here(struct rxctl *r, int cnt)
 }
 
 
-static wchar_t *match_here_r(wchar_t *rx, wchar_t *tx, int *size)
+static wchar_t *match_here_r(wchar_t *rx, wchar_t *tx, size_t *size)
 {
     struct rxctl r;
 
@@ -211,7 +211,7 @@ static wchar_t *match_here_r(wchar_t *rx, wchar_t *tx, int *size)
  *
  * Returns the address of the match.
  */
-wchar_t *aov_match(wchar_t *rx, wchar_t *tx, int *size)
+wchar_t *aov_match(wchar_t *rx, wchar_t *tx, size_t *size)
 {
     if (*rx == L'^')
         match_here_r(rx + 1, tx, size);
