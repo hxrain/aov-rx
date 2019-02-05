@@ -72,7 +72,7 @@ And its usage is pretty straightforward:
     int s;
     wchar_t *res;
  
-    res = aov_match(L"/[0-9]+/", L"The number is 123, indeed", &s);
+    res = aov_match(L"[0-9]+", L"The number is 123, indeed", &s);
  
     if (s) {
         /* res points to 123, and s contains 3 */
