@@ -59,7 +59,7 @@ Usage
 
 aov-rx consists only of one function:
 
- wchar_t *aov_match(wchar_t *rx, wchar_t *tx, int *size);
+ wchar_t *aov_match(wchar_t *rx, wchar_t *tx, size_t *size);
 
 And its usage is pretty straightforward:
 
@@ -69,7 +69,7 @@ And its usage is pretty straightforward:
  
  int main(int argc, char *argv[])
  {
-    int s;
+    size_t s;
     wchar_t *res;
  
     res = aov_match(L"[0-9]+", L"The number is 123, indeed", &s);
