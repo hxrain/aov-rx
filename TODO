@@ -4,10 +4,17 @@ aov-rx TODO / Bug List
 Release Critical Bugs
 ---------------------
 
- * 1007: Fix sets with * at the end of the string.
+None!
 
 Open Bugs
 ---------
+
+None!
+
+Open Warnings
+-------------
+
+ * 1007: Fix sets with * at the end of the string.
 
 Pending Enhancements
 --------------------
