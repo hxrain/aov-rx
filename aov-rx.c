@@ -200,10 +200,10 @@ static wchar_t *match_here_r(wchar_t *rx, wchar_t *tx, size_t *size)
  * aov_match - Matches a regular expression
  * @rx: the regular expression
  * @tx: the text to be matched
- * @size: a pointer to integer where the matching lenght is stored
+ * @size: a pointer to a size_t where the matching length is stored
  *
  * Matches the string @tx for the regular expression in @rx.
- * On output, the integer pointer by @size will contain the number
+ * On output, the size_t pointer by @size will contain the number
  * of matched characters (with 0 meaning that no matching was
  * possible). If the end of string mark ($) is used in the regular
  * expression and a match is effective, the ending zero is included
